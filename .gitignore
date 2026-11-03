@@ -13,6 +13,9 @@ dev-dist/
 supabase/.temp/
 supabase/.branches/
 
+# Vercel CLI (vinculacion local del proyecto)
+.vercel/
+
 # Logs
 *.log
 npm-debug.log*

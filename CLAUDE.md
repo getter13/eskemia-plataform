@@ -9,7 +9,7 @@ Caso de referencia: un empresario distribuidor que necesita controlar su operaci
 Cadena de módulos (correlativos, conectados automáticamente):
 1. **Compras** (futuro): genera órdenes de compra (OC).
 2. **Recepción** (este MVP): controla todo lo que ingresa contra remito/OC antes de entrar a depósito y a sistema.
-3. **Administración** (futuro): visualiza compra + recepción; último paso antes de aprobar la factura (control de tres vías OC ↔ recepción ↔ factura).
+3. **Administración** (futuro): visualiza compra + recepción; último paso antes de aprobar la factura (control de tres vías OC ↔ recepción ↔ factura). Debe incluir la acción para marcar una recepción como `INGRESADA_A_SISTEMA` (la RPC `marcar_ingresada` ya existe).
 
 ## Alcance del MVP
 
