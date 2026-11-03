@@ -1,0 +1,33 @@
+# Secretos: nunca commitear
+.env
+.env.*
+!.env.example
+
+# Dependencias y builds
+node_modules/
+dist/
+dev-dist/
+*.tsbuildinfo
+
+# Supabase CLI (estado local, incluye datos del proyecto vinculado)
+supabase/.temp/
+supabase/.branches/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Certificados locales
+*.pem
+*.key
+*.crt
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Claude Code: configuracion local
+.claude/settings.local.json
