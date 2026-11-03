@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, ChevronRight, LogOut, PackagePlus } from 'lucide-react';
+import { AlertTriangle, ChevronRight, ClipboardList, LogOut, PackagePlus } from 'lucide-react';
 import { Encabezado } from '../componentes/Encabezado';
 import { Modal } from '../componentes/Modal';
 import { db, type RecepcionLocal } from '../lib/db';
@@ -77,6 +77,11 @@ export function Inicio() {
         </section>
       </main>
       <footer className="barra-acciones">
+        {perfil && perfil.rol !== 'operario' && (
+          <button className="btn" onClick={() => navegar('/admin')}>
+            <ClipboardList size={20} /> Administración
+          </button>
+        )}
         <span className="espacio" />
         <button
           className="btn btn-texto"

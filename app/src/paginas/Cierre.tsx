@@ -49,9 +49,11 @@ export function Cierre() {
       <Encabezado>
         <h2>Firmas</h2>
       </Encabezado>
-      <main className="contenido estrecho">
-        <PadFirma ref={receptor} titulo="Firma del receptor" alCambiar={setOkReceptor} />
-        <PadFirma ref={transportista} titulo="Firma del transportista" alCambiar={setOkTransportista} />
+      <main className="contenido">
+        <div className="firmas">
+          <PadFirma ref={receptor} titulo="Firma del receptor" alCambiar={setOkReceptor} />
+          <PadFirma ref={transportista} titulo="Firma del transportista" alCambiar={setOkTransportista} />
+        </div>
       </main>
       <footer className="barra-acciones">
         <button className="btn" onClick={() => navegar(`/recepcion/${id}/resumen`)}>

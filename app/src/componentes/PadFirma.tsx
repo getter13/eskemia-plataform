@@ -18,17 +18,32 @@ export const PadFirma = forwardRef<
   const dibujando = useRef(false);
   const [firmado, setFirmado] = useState(false);
 
+  // Ajusta el lienzo a su tamaño real. Al rotar la tablet, conserva lo ya firmado.
   useEffect(() => {
     const c = canvas.current!;
-    const escala = window.devicePixelRatio || 1;
-    c.width = c.clientWidth * escala;
-    c.height = c.clientHeight * escala;
-    const ctx = c.getContext('2d')!;
-    ctx.scale(escala, escala);
-    ctx.lineWidth = 2.5;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.strokeStyle = TINTA;
+    const ajustar = () => {
+      const escala = window.devicePixelRatio || 1;
+      const ancho = Math.round(c.clientWidth * escala);
+      const alto = Math.round(c.clientHeight * escala);
+      if (ancho === 0 || alto === 0 || (c.width === ancho && c.height === alto)) return;
+      const previo = document.createElement('canvas');
+      previo.width = c.width;
+      previo.height = c.height;
+      previo.getContext('2d')!.drawImage(c, 0, 0);
+      c.width = ancho;
+      c.height = alto;
+      const ctx = c.getContext('2d')!;
+      ctx.drawImage(previo, 0, 0, ancho, alto);
+      ctx.setTransform(escala, 0, 0, escala, 0, 0);
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = TINTA;
+    };
+    ajustar();
+    const observador = new ResizeObserver(ajustar);
+    observador.observe(c);
+    return () => observador.disconnect();
   }, []);
 
   useImperativeHandle(ref, () => ({
@@ -49,7 +64,11 @@ export const PadFirma = forwardRef<
 
   function limpiar() {
     const c = canvas.current!;
-    c.getContext('2d')!.clearRect(0, 0, c.width, c.height);
+    const ctx = c.getContext('2d')!;
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, c.width, c.height);
+    ctx.restore();
     puntos.current = 0;
     setFirmado(false);
     alCambiar(false);

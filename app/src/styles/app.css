@@ -501,3 +501,354 @@ p {
   color: var(--signal-error);
   font-weight: 600;
 }
+
+/* Back */
+.contenido-admin {
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+.fila-fecha {
+  flex-wrap: nowrap;
+}
+.fila-fecha .btn {
+  flex: none;
+  padding: 0 var(--space-4);
+}
+.campo-fecha {
+  flex: 1;
+  min-width: 0;
+  max-width: 320px;
+}
+.campo-texto {
+  font-size: 16px;
+  resize: vertical;
+}
+.metricas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: var(--space-4);
+}
+.metrica {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+.metrica-valor {
+  font: 500 36px var(--font-mono);
+}
+.fila-bandeja {
+  flex-wrap: wrap;
+  padding: var(--space-4);
+}
+.fila-bandeja-datos {
+  flex: 1 1 320px;
+  min-width: 0;
+  align-items: flex-start;
+}
+.fila-bandeja-estado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 0 1 auto;
+}
+.fila-datos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-4);
+  padding-top: var(--space-2);
+}
+.grupo-compacto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: var(--space-2);
+}
+.checklist li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--brand);
+  font-weight: 600;
+}
+.checklist li.falta {
+  color: var(--signal-error);
+}
+.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr));
+  gap: var(--space-4);
+}
+.galeria-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.galeria-item img {
+  width: 100%;
+  height: 140px;
+  object-fit: contain;
+  background: var(--surface-100);
+  border-radius: var(--radius-sm);
+}
+.imagen-ampliada {
+  max-width: 100%;
+  max-height: 70dvh;
+  object-fit: contain;
+  align-self: center;
+}
+.lista-densa {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+.fila-densa {
+  display: grid;
+  grid-template-columns: 170px 80px minmax(0, 2fr) 130px minmax(0, 2fr);
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+.fila-densa:last-child {
+  border-bottom: 0;
+}
+.texto-corte {
+  overflow-wrap: anywhere;
+}
+.linea-tiempo {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 var(--space-4);
+  border-left: 2px solid var(--brand);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.linea-tiempo li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* Firmas: lado a lado cuando hay ancho, una debajo de la otra cuando no. */
+.firmas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: var(--space-6);
+}
+.firma {
+  height: clamp(160px, 32dvh, 320px);
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive. Se ajusta por ancho y por alto: una tablet de 7" apaisada tiene
+   poco alto, y una vertical poco ancho.
+   --------------------------------------------------------------------------- */
+html,
+body,
+#root,
+.pantalla {
+  height: 100dvh;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+.encabezado {
+  flex-wrap: wrap;
+}
+.encabezado > span.muted,
+.encabezado > h2 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.encabezado .sync {
+  min-height: var(--tactil);
+}
+.contenido > *,
+.tarjeta-tactil > * {
+  min-width: 0;
+}
+.grilla {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+}
+.btn-grande {
+  font-size: clamp(24px, 4vw, 36px);
+  min-height: clamp(88px, 16dvh, 112px);
+}
+.selector-cantidad {
+  grid-template-columns: clamp(72px, 12vw, 112px) minmax(0, 1fr) clamp(72px, 12vw, 112px);
+}
+.selector-cantidad .btn,
+.cantidad-valor {
+  min-height: clamp(88px, 18dvh, 112px);
+}
+.cantidad-valor {
+  font-size: clamp(24px, 3.4vw, 36px);
+  text-align: center;
+}
+.item-activo h1 {
+  overflow-wrap: anywhere;
+}
+.teclado .btn {
+  min-height: clamp(56px, 9dvh, 72px);
+}
+.visor {
+  min-height: clamp(56px, 9dvh, 72px);
+  font-size: clamp(24px, 5dvh, 36px);
+}
+
+/* Tablets chicas o verticales: la lista de cargados va debajo. */
+@media (max-width: 900px) {
+  .carga {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-content: start;
+    overflow-y: auto;
+  }
+  .carga-principal {
+    overflow: visible;
+  }
+  .carga-lista {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    overflow: visible;
+  }
+  .fila-control {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .fila-control > :first-child,
+  .fila-control > :last-child {
+    grid-column: 1 / -1;
+  }
+  .fila-densa {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2px var(--space-4);
+  }
+  .fila-bandeja {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .fila-bandeja-estado {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .fila-bandeja > .lucide {
+    grid-column: 2;
+    grid-row: 1 / 3;
+  }
+}
+
+/* Tablets de 7" verticales. */
+@media (max-width: 640px) {
+  .contenido,
+  .carga-principal,
+  .carga-lista {
+    padding: var(--space-4);
+  }
+  .encabezado,
+  .barra-acciones {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
+  .barra-acciones {
+    gap: var(--space-2);
+  }
+  .barra-acciones .espacio {
+    display: none;
+  }
+  .barra-acciones .btn {
+    flex: 1 1 calc(50% - var(--space-2));
+    padding: var(--space-2);
+  }
+  .barra-acciones .btn-primario {
+    flex-basis: 100%;
+    order: 1;
+  }
+  h1 {
+    font-size: 24px;
+  }
+  .metricas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .item-activo {
+    padding: var(--space-4);
+  }
+  .fondo-modal {
+    padding: var(--space-2);
+  }
+  .modal {
+    padding: var(--space-4);
+  }
+}
+
+/* Apaisadas con poco alto: se gana espacio vertical para el contenido. */
+@media (max-height: 640px) {
+  .encabezado {
+    min-height: 56px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  .barra-acciones {
+    padding-top: var(--space-2);
+    padding-bottom: var(--space-2);
+  }
+  .contenido,
+  .carga-principal,
+  .carga-lista {
+    padding-top: var(--space-2);
+    padding-bottom: var(--space-2);
+    gap: var(--space-2);
+  }
+  .estado-lector {
+    min-height: var(--tactil);
+    font-size: 16px;
+  }
+  .item-activo {
+    padding: var(--space-2) var(--space-4);
+    gap: var(--space-2);
+  }
+  .item-activo h1 {
+    font-size: 24px;
+  }
+  .fondo-modal {
+    padding: var(--space-2);
+  }
+  .modal {
+    padding: var(--space-2) var(--space-4);
+    gap: var(--space-2);
+  }
+  .vacio {
+    padding: var(--space-4);
+    gap: var(--space-2);
+  }
+}
+
+/* Pantallas grandes: el contenido no se estira de más. */
+@media (min-width: 1600px) {
+  .carga {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
+  .contenido.estrecho {
+    max-width: 1040px;
+  }
+}

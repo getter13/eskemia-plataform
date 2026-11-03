@@ -1,5 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { ProveedorSesion, cerrarSesion, useSesion } from './lib/sesion';
+import { Bandeja } from './paginas/admin/Bandeja';
+import { Detalle } from './paginas/admin/Detalle';
 import { Carga } from './paginas/Carga';
 import { Cierre } from './paginas/Cierre';
 import { Inicio } from './paginas/Inicio';
@@ -36,6 +38,14 @@ function Rutas() {
       <Route path="/recepcion/:id/carga" element={<Carga />} />
       <Route path="/recepcion/:id/resumen" element={<Resumen />} />
       <Route path="/recepcion/:id/cierre" element={<Cierre />} />
+      <Route
+        path="/admin"
+        element={perfil.rol === 'operario' ? <Navigate to="/" replace /> : <Bandeja />}
+      />
+      <Route
+        path="/admin/recepcion/:id"
+        element={perfil.rol === 'operario' ? <Navigate to="/" replace /> : <Detalle />}
+      />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
