@@ -21,8 +21,9 @@ Hardware: **tablet + escáner 2D** en modo teclado (HID, sufijo Enter). Sin bala
 3. Pantalla de carga:
    - Input con foco permanente que captura lecturas del escáner (Enter = fin de lectura). Fallback: escaneo por cámara (ZXing).
    - Busca producto por GTIN/EAN. Si no existe: alta rápida marcada `pendiente_validacion`.
-   - Cantidad con botones +/- grandes. Si el producto lo requiere: lote y vencimiento.
-   - Carga manual (sin código): búsqueda por nombre, **foto y motivo obligatorios**.
+   - Cantidad con botones +/- grandes, en unidades o kg según el `tipo_medida` fijo de cada producto. Si el producto lo requiere: lote y vencimiento.
+   - Los productos llevan solo su nombre, sin tamaño ni envase.
+   - Carga manual (sin código): navegación táctil por categorías y productos, sin tipear códigos, **foto y motivo obligatorios**.
    - Feedback visual y sonoro en cada lectura (OK / error).
 4. Resumen: cantidades leídas vs cantidades del remito (ingresadas por el operario). Diferencias (faltante / sobrante / rechazo) con motivo obligatorio.
 5. Cierre: firma en pantalla (canvas) del receptor y del transportista → estado `CERRADA_OK` o `CERRADA_CON_DIFERENCIAS`.
@@ -54,7 +55,8 @@ Las transiciones se hacen **solo** mediante funciones RPC de Postgres que valida
 
 ```
 tenants, sedes, perfiles (user_id, rol: operario|supervisor|admin, sede_id), dispositivos
-proveedores, productos (gtin, nombre, tipo_medida: UNIDAD|PESO, requiere_lote, requiere_vencimiento, pendiente_validacion)
+categorias (nombre, orden)
+proveedores, productos (gtin, nombre, categoria_id, tipo_medida: UNIDAD|PESO, requiere_lote, requiere_vencimiento, pendiente_validacion)
 ordenes_compra, oc_items                 -- vacías en el MVP, las alimentará el módulo Compras
 recepciones (estado, proveedor_id, nro_remito, oc_id null, usuario_id, abierta_en, cerrada_en, validada_por, validada_en, observacion)
 recepcion_items (producto_id, cant_remito, cant_recibida, diferencia, motivo_diferencia, lote, vencimiento)
