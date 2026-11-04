@@ -60,6 +60,8 @@ Entrá como `encargado@eskemia.test`, en **Aprobar**.
 
 Entrá como `operario@eskemia.test`. Las órdenes aparecen en **Pendientes de recibir** con la etiqueta *No recibido* (hasta 20 segundos después de aprobarse).
 
+También están las 3 órdenes demo cargadas antes, con los números más bajos: en este guion, elegí siempre la del proveedor indicado con el **número más alto**.
+
 1. Tocá la orden de **Alimentos Demo del Sur**. Tiene que mostrar el proveedor y la OC fijos, y pedir solo número de remito y foto.
 2. **Empezar a cargar** y escaneá dos veces `17799000000010`: cada lectura suma 12.
 3. **Ir al resumen**.
