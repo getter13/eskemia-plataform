@@ -4,6 +4,7 @@ import { tienePermiso } from './lib/db';
 import { ProveedorSesion, cerrarSesion, useSesion } from './lib/sesion';
 import { Bandeja } from './paginas/admin/Bandeja';
 import { Detalle } from './paginas/admin/Detalle';
+import { Importar } from './paginas/admin/Importar';
 import { Roles } from './paginas/admin/Roles';
 import { Carga } from './paginas/Carga';
 import { Cierre } from './paginas/Cierre';
@@ -51,6 +52,10 @@ function Rutas() {
       <Route path="/recepcion/:id/cierre" element={<Requiere permiso={OPERAR}><Cierre /></Requiere>} />
       <Route path="/admin" element={<Requiere permiso={VALIDAR}><Bandeja /></Requiere>} />
       <Route path="/admin/recepcion/:id" element={<Requiere permiso={VALIDAR}><Detalle /></Requiere>} />
+      <Route
+        path="/admin/importar"
+        element={<Requiere permiso="compras.catalogo.gestionar"><Importar /></Requiere>}
+      />
       <Route
         path="/admin/roles"
         element={<Requiere permiso="admin.usuarios.gestionar"><Roles /></Requiere>}

@@ -175,6 +175,7 @@ El marketplace se diseña para **pedir desde el celular, en cualquier momento y 
 - Nombre, presentación por defecto, proveedor, último precio, badge "Requiere aprobación" (texto + ícono).
 - Botón "+" que se transforma en stepper "− 2 +" sin salir de la lista. Vibración corta al agregar.
 - Toque en la tarjeta → bottom sheet para cambiar presentación o proveedor.
+- Un producto puede tener varios proveedores. Si tiene más de uno activo, **quien arma el pedido elige a quién comprarle** antes de agregarlo; `preferido` solo lo muestra primero, no decide por la persona. Con un único proveedor, se agrega directo.
 
 **Carrito**
 - Barra fija inferior siempre visible: "3 proveedores · 14 ítems · $ 182.400 — Ver pedido".
