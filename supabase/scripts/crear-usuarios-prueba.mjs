@@ -6,7 +6,7 @@
 import { spawnSync } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import { appendFileSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { homedir, tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const TENANT = '00000000-0000-4000-8000-000000000001';
@@ -110,6 +110,13 @@ try {
   }
   console.log('Usuarios listos:', USUARIOS.map((u) => `${u.email} (${u.rol})`).join(', '));
   console.log('Contraseñas en .env.local:', USUARIOS.map((u) => u.variable).join(', '));
+  // Solo con --escritorio: es texto plano, fuera del repo. Son usuarios de prueba.
+  if (process.argv.includes('--escritorio')) {
+    const destino = join(homedir(), 'Desktop', 'Eskemia - usuarios de prueba.txt');
+    const lineas = USUARIOS.map((u, i) => `${u.nombreRol}\n  Usuario: ${u.email}\n  Contraseña: ${claves[i]}\n`);
+    writeFileSync(destino, `Eskemia: usuarios de prueba. No usar con datos reales.\n\n${lineas.join('\n')}`, 'utf8');
+    console.log('Credenciales en:', destino);
+  }
 } finally {
   rmSync(dir, { recursive: true, force: true });
 }
