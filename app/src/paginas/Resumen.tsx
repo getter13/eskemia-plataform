@@ -25,6 +25,11 @@ const ETIQUETA_TIPO: Record<TipoDiferencia, string> = {
 const diferencia = (i: ItemLocal) =>
   i.cant_remito === null ? null : redondear(i.cant_recibida - i.cant_remito);
 
+function verboDiferencia(dif: number) {
+  const verbo = dif > 0 ? 'Sobra' : 'Falta';
+  return Math.abs(dif) === 1 ? verbo : `${verbo}n`;
+}
+
 function ModalDiferencia({
   item,
   alCerrar,
@@ -55,7 +60,7 @@ function ModalDiferencia({
   return (
     <Modal titulo={`Diferencia en ${item.producto_nombre}`} alCerrar={alCerrar}>
       <p>
-        {dif > 0 ? 'Sobran' : 'Faltan'}{' '}
+        {verboDiferencia(dif)}{' '}
         <strong>{formatoCantidad(Math.abs(dif), item.tipo_medida)}</strong> respecto del remito.
       </p>
       {tipos.length > 1 && (
@@ -184,8 +189,8 @@ export function Resumen() {
                       onClick={() => setClaveDiferencia(i.key)}
                     >
                       <AlertTriangle size={20} />
-                      {dif > 0 ? '+' : ''}
-                      {formatoCantidad(dif, i.tipo_medida)}
+                      {verboDiferencia(dif)} {formatoCantidad(Math.abs(dif), i.tipo_medida)} respecto del
+                      remito
                       {conMotivo ? ` · ${i.motivo_diferencia}` : ' · Indicar motivo'}
                     </button>
                   )}
