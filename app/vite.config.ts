@@ -26,6 +26,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,woff2,png}'],
+        // El PDF necesita conexión y pesa mucho: no se precarga en cada dispositivo.
+        globIgnores: ['**/ordenPdf-*.js'],
         navigateFallback: '/index.html',
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
       },

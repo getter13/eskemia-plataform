@@ -111,7 +111,8 @@ export type TipoOp =
   | 'fijar_control_item'
   | 'iniciar_control'
   | 'cerrar_recepcion'
-  | 'reabrir_recepcion';
+  | 'reabrir_recepcion'
+  | 'confirmar_pedido';
 
 export interface OpCola {
   seq?: number;

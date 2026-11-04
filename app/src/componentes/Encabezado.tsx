@@ -16,6 +16,7 @@ const ETIQUETAS_OP: Record<string, string> = {
   iniciar_control: 'Inicio de control',
   cerrar_recepcion: 'Cierre de recepción',
   reabrir_recepcion: 'Reapertura de recepción',
+  confirmar_pedido: 'Confirmación de pedido',
 };
 
 function IndicadorSync() {

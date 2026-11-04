@@ -168,7 +168,6 @@ El marketplace se diseña para **pedir desde el celular, en cualquier momento y 
 **Inicio (móvil)**
 - Buscador fijo arriba, tolerante a errores de tipeo. Busca en el dispositivo sobre el catálogo guardado, para funcionar sin señal.
 - Chips de rubros desplazables.
-- Secciones: "Repetir último pedido" (un toque → carrito precargado), "Lo que más pedís", "Tus plantillas", favoritos.
 - Barra inferior de navegación: Inicio · Buscar · Pedidos · Perfil.
 
 **Tarjeta de producto**
@@ -281,7 +280,7 @@ Nota: si el MVP de Recepción ya tiene `perfiles (rol)`, la etapa 1 migra ese ca
 | 2 | Catálogo | Modelo Rubro → Categoría → Producto → Proveedor, con presentaciones, códigos múltiples y precios. El alta de productos pertenece al módulo de Administración (futuro); hasta entonces se carga por seed o CSV | 2 días |
 | 3 | Importación CSV | Plantillas CSV descargables, validación con Zod, vista previa de errores, carga masiva | 1 día |
 | 4 | Reglas de aprobación | Tabla, pantalla de configuración (empresa/rubro/producto), `evaluar_aprobacion` con tests SQL | 1,5 días |
-| 5 | Marketplace móvil y carrito | PWA instalable, inicio con "repetir último pedido", buscador, chips de rubro, tarjeta con stepper inline, bottom sheets, carrito agrupado por proveedor con barra fija, persistencia local, auditoría UX a 375 px | 3 días |
+| 5 | Marketplace móvil y carrito | PWA instalable, buscador, chips de rubro, tarjeta con stepper inline, bottom sheets, carrito agrupado por proveedor con barra fija, persistencia local, auditoría UX a 375 px | 3 días |
 | 6 | Confirmación y OC | `confirmar_pedido`, numeración, snapshot, cola offline de confirmación, seguimiento por OC, PDF, compartir por WhatsApp/mail, marcar enviada | 2 días |
 | 7 | Bandeja de aprobación | Tarjetas móviles por nivel, aprobar con deshacer, rechazar en bottom sheet, tiempo real, eventos | 1 día |
 | 8 | Pendientes en Recepción | `v_pendientes_recepcion`, sección Pendientes en el kiosco, selección de OC, precarga, escaneo por código → presentación → factor, triple cantidad, saldos | 2,5 días |
@@ -306,7 +305,7 @@ Total estimado: ~17,5 días de trabajo efectivo (≈ 4 semanas calendario). Es u
 - Tiempo de armado de pedido y tiempo medio de aprobación.
 - Diferencias detectadas en recepción contra OC (cantidad y monto).
 - % de OC recibidas completas y en fecha, por proveedor.
-- % de pedidos hechos desde el celular; tiempo para armar un pedido habitual en móvil (objetivo < 60 s); toques para repetir el último pedido (objetivo ≤ 3).
+- % de pedidos hechos desde el celular; tiempo para armar un pedido habitual en móvil (objetivo < 60 s).
 
 ## 12. Pendientes de relevamiento
 

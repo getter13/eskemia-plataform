@@ -24,7 +24,7 @@ Consecuencias:
 
 1. **Mobile first real.** Se diseña a 375 px y se amplía. Ninguna función operativa existe solo en escritorio.
 2. **Zona del pulgar.** Acciones principales abajo: barra de navegación inferior, barra fija de carrito/confirmación, hojas inferiores (bottom sheets) en lugar de modales centrados.
-3. **Un toque para lo frecuente.** Agregar al carrito, repetir el último pedido, aprobar una OC: un toque. Lo infrecuente puede costar dos.
+3. **Un toque para lo frecuente.** Agregar al carrito, aprobar una OC: un toque. Lo infrecuente puede costar dos.
 4. **Valores por defecto inteligentes.** Presentación, proveedor y cantidad sugeridos según historial y configuración. El usuario corrige, no completa.
 5. **Nada se pierde.** Carrito, borradores y formularios se guardan solos en el dispositivo. Cerrar la app no borra trabajo.
 6. **Respuesta inmediata.** Actualización optimista (la UI responde antes que el servidor), sin spinners bajo 100 ms, skeletons en cargas largas, nunca pantallas en blanco.
@@ -67,7 +67,6 @@ Consecuencias:
 ## 7. Métricas de experiencia
 
 - Tiempo para armar un pedido habitual en móvil: objetivo < 60 s.
-- Toques para repetir el último pedido: objetivo ≤ 3.
 - Tiempo para aprobar una OC desde la notificación: objetivo < 15 s.
 - Tareas completadas sin ayuda en la primera prueba con usuarios reales.
 

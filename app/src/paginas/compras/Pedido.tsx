@@ -11,6 +11,8 @@ import {
   type EvaluacionOrden,
   type GrupoProveedor,
 } from '../../lib/catalogo';
+import { tienePermiso } from '../../lib/db';
+import { confirmarPedido } from '../../lib/ordenes';
 import { useSesion } from '../../lib/sesion';
 
 const ESPERA_EVALUACION_MS = 400;
@@ -102,6 +104,15 @@ export function Pedido() {
   const quitar = useCarrito((s) => s.quitar);
   const { grupos, noDisponibles } = useMemo(() => agruparPedido(productos ?? [], lineas), [productos, lineas]);
   const total = grupos.reduce((n, g) => n + g.subtotal, 0);
+  const [confirmando, setConfirmando] = useState(false);
+  const puedePedir = tienePermiso(perfil, 'compras.pedido.crear');
+
+  async function confirmar() {
+    if (!perfil) return;
+    setConfirmando(true);
+    await confirmarPedido(perfil.sede_id, grupos);
+    navegar('/compras/pedidos');
+  }
 
   return (
     <div className="pantalla mk-pantalla">
@@ -147,11 +158,16 @@ export function Pedido() {
             </span>
             <strong className="mono">{formatoMoneda(total)}</strong>
           </div>
-          {/* confirmar_pedido llega en la etapa 6. */}
-          <button className="btn btn-primario ancho mk-boton" disabled>
+          {noDisponibles.length > 0 && <span className="muted">Quitá lo que ya no está disponible para confirmar.</span>}
+          {!puedePedir && <span className="muted">Tu usuario puede ver el catálogo, pero no confirmar pedidos.</span>}
+          <button
+            className="btn btn-primario ancho mk-boton"
+            data-testid="confirmar-pedido"
+            disabled={confirmando || !puedePedir || noDisponibles.length > 0}
+            onClick={() => void confirmar()}
+          >
             Confirmar pedido
           </button>
-          <span className="muted">La confirmación todavía no está disponible.</span>
         </footer>
       )}
       <NavCompras />

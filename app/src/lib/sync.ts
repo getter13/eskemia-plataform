@@ -126,6 +126,11 @@ async function ejecutar(o: OpCola) {
     case 'reabrir_recepcion':
       await rpc('reabrir_recepcion', o.args);
       return;
+    case 'confirmar_pedido': {
+      const { resumen: _resumen, ...args } = o.args;
+      await rpc('confirmar_pedido', args);
+      return;
+    }
   }
 }
 

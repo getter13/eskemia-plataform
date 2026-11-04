@@ -25,7 +25,7 @@ El marketplace es **interno**: solo usuarios de la empresa. En el MVP los provee
 
 Escala: Eskemia es una plataforma de largo plazo con muchos módulos futuros. Diseñar cada tabla, permiso y RPC pensando en multiempresa, multisede y módulos que todavía no existen. Ante la duda entre un atajo y una estructura extensible de costo similar, elegir la extensible.
 
-**Experiencia: mobile first.** El marketplace se usa principalmente desde el celular, en cualquier lugar, con la experiencia de Mercado Libre / PedidosYa: buscador fijo, "repetir último pedido", agregar con un toque (stepper inline), barra fija de carrito con total, carrito agrupado por proveedor, seguimiento de cada OC como un envío. Se diseña a 375 px primero; el escritorio es para catálogo, configuración, tablero y reportes. Los principios completos están en `docs/principios-ux.md` y aplican a todos los módulos.
+**Experiencia: mobile first.** El marketplace se usa principalmente desde el celular, en cualquier lugar, con la experiencia de Mercado Libre / PedidosYa: buscador fijo, agregar con un toque (stepper inline), barra fija de carrito con total, carrito agrupado por proveedor, seguimiento de cada OC como un envío. Se diseña a 375 px primero; el escritorio es para catálogo, configuración, tablero y reportes. Los principios completos están en `docs/principios-ux.md` y aplican a todos los módulos.
 
 **Prioridad del MVP:** que las OC aprobadas aparezcan como pendientes en el perfil Recepción (etapa 8). Todo lo demás se diseña en función de ese resultado.
 
