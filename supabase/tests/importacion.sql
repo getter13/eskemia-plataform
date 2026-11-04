@@ -4,6 +4,9 @@
 
 begin;
 
+insert into public.categorias (tenant_id, nombre)
+values ('00000000-0000-4000-8000-000000000001', 'Sin rubro test');
+
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-c000-000000000002","role":"authenticated"}', true);
 set local role authenticated;
 
@@ -43,9 +46,9 @@ begin
   if not (r ->> 'aplicado')::boolean then raise exception 'TEST: categorías: %', r; end if;
 
   -- Adopta la categoría sin rubro en lugar de duplicarla.
-  r := public.importar_catalogo('categorias', '[{"fila":2,"rubro":"Comida test","categoria":"Categoría de prueba"}]', true);
+  r := public.importar_catalogo('categorias', '[{"fila":2,"rubro":"Comida test","categoria":"Sin rubro test"}]', true);
   if (r ->> 'actualizados')::int <> 1 or exists (
-    select 1 from public.categorias x where x.nombre = 'Categoría de prueba' and x.rubro_id is null
+    select 1 from public.categorias x where x.nombre = 'Sin rubro test' and x.rubro_id is null
   ) then
     raise exception 'TEST: no adoptó la categoría sin rubro: %', r;
   end if;
