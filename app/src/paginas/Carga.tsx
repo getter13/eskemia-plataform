@@ -36,6 +36,9 @@ interface Origen {
   crudo: string | null;
   motivo: string | null;
   foto: Blob | null;
+  // Presentación leída por código de barras: cuántas unidades suma cada lectura.
+  factor?: number;
+  presentacion?: string;
 }
 
 type Panel =
@@ -306,10 +309,21 @@ export function Carga() {
       if (origen.foto) await agregarAdjunto(id, 'MANUAL', origen.foto, 'jpg', item.key);
       sonidoOk();
       setActivoKey(item.key);
-      setAviso({
-        tipo: 'ok',
-        texto: `${producto.nombre}: ${formatoCantidad(item.cant_recibida, producto.tipo_medida)}`,
-      });
+      const conOrden = !!(await db.recepciones.get(id))?.oc_id;
+      const pedido = await db.items
+        .where('recepcion_id')
+        .equals(id)
+        .filter((i) => i.producto_id === producto.id && (i.cant_pedida ?? null) !== null)
+        .count();
+      const total = formatoCantidad(item.cant_recibida, producto.tipo_medida);
+      setAviso(
+        conOrden && pedido === 0
+          ? { tipo: 'error', texto: `${producto.nombre}: no está en la orden de compra` }
+          : {
+              tipo: 'ok',
+              texto: `${producto.nombre}${origen.presentacion ? ` (${origen.presentacion})` : ''}: ${total}`,
+            },
+      );
       setPanel({ tipo: 'ninguno' });
     },
     [id, avisarError],
@@ -318,11 +332,13 @@ export function Carga() {
   /** Con lote y vencimiento resueltos, guarda o pide la cantidad según el formato. */
   const continuar = useCallback(
     async (producto: Producto, origen: Origen, lote: string | null, vencimiento: string | null) => {
-      if (producto.tipo_medida === 'PESO' || origen.tipo === 'MANUAL') {
+      // Una presentación con factor ya dice la cantidad: una bolsa de 25 kg no se pesa.
+      const factor = origen.factor ?? 1;
+      if ((producto.tipo_medida === 'PESO' && factor === 1) || origen.tipo === 'MANUAL') {
         setPanel({ tipo: 'cantidad', producto, origen, lote, vencimiento });
         return;
       }
-      await guardar(producto, origen, 1, lote, vencimiento);
+      await guardar(producto, origen, factor, lote, vencimiento);
     },
     [guardar],
   );
@@ -368,23 +384,34 @@ export function Carga() {
       const texto = crudo.trim();
       if (!texto) return;
       const codigo = interpretarCodigo(texto);
-      if (!codigo) {
+      // Códigos internos o GS1-128 no son GTIN: se buscan tal como se leyeron.
+      const registrado = await db.codigos.get(codigo?.gtin14 ?? texto);
+      if (!codigo && !registrado) {
         setPanel({ tipo: 'ninguno' });
         avisarError(`Código no válido: ${texto.slice(0, 24)}. Usá la carga manual.`);
         return;
       }
-      const producto = await db.productos.where('gtin14').equals(codigo.gtin14).first();
+      const producto = registrado
+        ? await db.productos.get(registrado.producto_id)
+        : await db.productos.where('gtin14').equals(codigo!.gtin14).first();
       if (!producto) {
         sonidoError();
         setAviso({ tipo: 'error', texto: 'Producto no cargado' });
-        setPanel({ tipo: 'alta', crudo: texto, gtin: codigo.gtin });
+        if (codigo) setPanel({ tipo: 'alta', crudo: texto, gtin: codigo.gtin });
         return;
       }
       setPanel({ tipo: 'ninguno' });
       await resolverProducto(
         producto,
-        { tipo: 'ESCANEO', crudo: texto, motivo: null, foto: null },
-        codigo,
+        {
+          tipo: 'ESCANEO',
+          crudo: texto,
+          motivo: null,
+          foto: null,
+          factor: registrado?.factor,
+          presentacion: registrado && registrado.factor !== 1 ? registrado.presentacion : undefined,
+        },
+        codigo ?? undefined,
       );
     },
     [avisarError, resolverProducto],
@@ -450,6 +477,9 @@ export function Carga() {
           {activo ? (
             <div className="tarjeta item-activo" data-testid="item-activo">
               <h1>{activo.producto_nombre}</h1>
+              {(activo.cant_pedida ?? null) !== null && (
+                <Marcador titulo="Pedido" valor={formatoCantidad(activo.cant_pedida!, activo.tipo_medida)} />
+              )}
               {(activo.lote || activo.vencimiento) && (
                 <div className="fila">
                   {activo.lote && <Marcador titulo="Lote" valor={activo.lote} />}
@@ -481,7 +511,7 @@ export function Carga() {
         </section>
 
         <aside className="carga-lista">
-          <h2>Cargados ({items.length})</h2>
+          <h2>Productos ({items.length})</h2>
           {items.map((i) => (
             <button
               className="tarjeta tarjeta-tactil fila-item"
@@ -492,6 +522,9 @@ export function Carga() {
               <span className="grupo">
                 <strong>{i.producto_nombre}</strong>
                 {i.lote && <span className="mono muted">Lote {i.lote}</span>}
+                {(i.cant_pedida ?? null) !== null && (
+                  <span className="mono muted">Pedido {formatoCantidad(i.cant_pedida!, i.tipo_medida)}</span>
+                )}
               </span>
               <span className="mono">{formatoCantidad(i.cant_recibida, i.tipo_medida)}</span>
             </button>

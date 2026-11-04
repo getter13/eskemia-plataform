@@ -44,12 +44,15 @@ export interface FilaBandeja {
   items_con_diferencia: number;
   checklist: Checklist;
   remito_duplicado: boolean;
+  oc_id: string | null;
+  oc_numero: string | null;
   semaforo: Semaforo;
 }
 
 export interface ItemDetalle {
   id: string;
   cant_remito: number | null;
+  cant_pedida: number | null;
   cant_recibida: number;
   diferencia: number | null;
   tipo_diferencia: TipoDiferencia | null;
@@ -104,10 +107,10 @@ export interface Detalle {
 }
 
 const COLUMNAS_BANDEJA =
-  'id,sede,estado,proveedor_id,proveedor,nro_remito,usuario_id,abierta_en,cerrada_en,validada_por,validada_en,observacion,fecha,items,items_con_diferencia,checklist,remito_duplicado,semaforo';
+  'id,sede,estado,proveedor_id,proveedor,nro_remito,usuario_id,abierta_en,cerrada_en,validada_por,validada_en,observacion,fecha,items,items_con_diferencia,checklist,remito_duplicado,semaforo,oc_id,oc_numero';
 
 const COLUMNAS_ITEM =
-  'id,cant_remito,cant_recibida,diferencia,tipo_diferencia,motivo_diferencia,lote,vencimiento,productos(nombre,gtin,tipo_medida,pendiente_validacion)';
+  'id,cant_remito,cant_recibida,cant_pedida,diferencia,tipo_diferencia,motivo_diferencia,lote,vencimiento,productos(nombre,gtin,tipo_medida,pendiente_validacion)';
 
 function exigir<T>(r: { data: T | null; error: { message: string } | null }): T {
   if (r.error) throw new Error(r.error.message);

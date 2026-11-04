@@ -50,6 +50,7 @@ async function resolverPerfil(userId: string): Promise<Perfil | null> {
 
   const perfil: Perfil = { ...data, sede_id: sedeId, permisos: (permisos ?? []) as PermisoAsignado[] };
   await guardarMeta(clave, perfil);
+  await guardarMeta('sede_actual', sedeId);
   return perfil;
 }
 

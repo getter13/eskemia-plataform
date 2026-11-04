@@ -30,7 +30,13 @@ const ETIQUETA_ADJUNTO: Record<TipoAdjunto, string> = {
   FIRMA_TRANSPORTISTA: 'Firma del transportista',
 };
 
-const ETIQUETA_DIFERENCIA = { FALTANTE: 'Faltante', SOBRANTE: 'Sobrante', RECHAZO: 'Rechazo' };
+const ETIQUETA_DIFERENCIA = {
+  FALTANTE: 'Faltante',
+  SOBRANTE: 'Sobrante',
+  RECHAZO: 'Rechazo',
+  NO_PEDIDO: 'No pedido',
+  SUSTITUCION: 'Sustitución',
+};
 
 function describirEvento(e: EventoDetalle): { titulo: string; detalle: string | null } {
   const p = e.payload;
@@ -209,6 +215,9 @@ export function Detalle() {
                 )}
               </div>
               <div className="fila-datos">
+                <Celda titulo="Orden de compra">
+                  <span className="mono">{r.oc_numero ?? 'Sin orden de compra'}</span>
+                </Celda>
                 <Celda titulo="Remito o factura">
                   <span className="mono">{r.nro_remito}</span>
                 </Celda>
@@ -258,7 +267,7 @@ export function Detalle() {
                     {i.productos.pendiente_validacion && (
                       <span className="etiqueta etiqueta-alerta">Producto pendiente de validar</span>
                     )}
-                    {i.diferencia !== null && Number(i.diferencia) !== 0 && (
+                    {i.tipo_diferencia && i.motivo_diferencia && (
                       <span className="etiqueta etiqueta-alerta">
                         <AlertTriangle size={16} />
                         {i.tipo_diferencia ? ETIQUETA_DIFERENCIA[i.tipo_diferencia] : 'Diferencia'}
@@ -269,6 +278,13 @@ export function Detalle() {
                     {i.productos.gtin && (
                       <Celda titulo="GTIN">
                         <span className="mono">{i.productos.gtin}</span>
+                      </Celda>
+                    )}
+                    {r.oc_id && (
+                      <Celda titulo="Pedido">
+                        {i.cant_pedida === null
+                          ? 'No pedido'
+                          : formatoCantidad(Number(i.cant_pedida), i.productos.tipo_medida)}
                       </Celda>
                     )}
                     <Celda titulo="Remito">

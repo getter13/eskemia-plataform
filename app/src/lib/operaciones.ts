@@ -6,6 +6,7 @@ import {
   idDispositivo,
   type ItemLocal,
   type OpCola,
+  type PendienteRecepcion,
   type Perfil,
   type Producto,
   type TipoAdjunto,
@@ -107,11 +108,17 @@ export async function altaProducto(datos: {
 
 export async function abrirRecepcion(
   perfil: Perfil,
-  datos: { proveedor_id: string; proveedor_nombre: string; nro_remito: string; foto: Blob },
+  datos: {
+    proveedor_id: string;
+    proveedor_nombre: string;
+    nro_remito: string;
+    foto: Blob;
+    oc?: PendienteRecepcion | null;
+  },
 ): Promise<string> {
   const id = crypto.randomUUID();
   const ahora = new Date().toISOString();
-  await db.transaction('rw', db.recepciones, db.adjuntos, db.cola, async () => {
+  await db.transaction('rw', db.recepciones, db.adjuntos, db.items, db.cola, async () => {
     await db.recepciones.put({
       id,
       tenant_id: perfil.tenant_id,
@@ -123,7 +130,33 @@ export async function abrirRecepcion(
       abierta_en: ahora,
       cerrada_en: null,
       observacion: null,
+      oc_id: datos.oc?.id ?? null,
+      oc_numero: datos.oc?.numero ?? null,
     });
+    // Lo que falta recibir de la orden: el operario compara contra esto.
+    await db.items.bulkPut(
+      (datos.oc?.items ?? [])
+        .filter((i) => i.saldo > 0)
+        .map((i, n) => ({
+          key: claveItem(id, i.producto_id, null, null),
+          server_id: null,
+          recepcion_id: id,
+          producto_id: i.producto_id,
+          producto_nombre: i.nombre,
+          tipo_medida: i.tipo_medida,
+          lote: null,
+          vencimiento: null,
+          cant_recibida: 0,
+          cant_remito: null,
+          cant_pedida: i.saldo,
+          tipo_diferencia: null,
+          motivo_diferencia: null,
+          ultimo_tipo: null,
+          ultimo_crudo: null,
+          ultimo_motivo: null,
+          orden: n,
+        })),
+    );
     await db.cola.add(
       op('abrir_recepcion', id, {
         p_id: id,
@@ -132,6 +165,7 @@ export async function abrirRecepcion(
         p_sede_id: perfil.sede_id,
         p_abierta_en: ahora,
         p_dispositivo_id: idDispositivo(),
+        p_oc_id: datos.oc?.id ?? null,
       }),
     );
     await encolarAdjunto(perfil, id, 'REMITO', datos.foto, 'jpg', null);
@@ -227,6 +261,7 @@ export async function registrarLectura(d: DatosLectura): Promise<ItemLocal | nul
       vencimiento: d.vencimiento,
       cant_recibida: cantidad,
       cant_remito: previo?.cant_remito ?? null,
+      cant_pedida: previo?.cant_pedida ?? null,
       tipo_diferencia: previo?.tipo_diferencia ?? null,
       motivo_diferencia: previo?.motivo_diferencia ?? null,
       ultimo_tipo: d.tipo,
@@ -316,6 +351,7 @@ export async function fijarControl(
       vencimiento,
       cant_recibida: previo?.cant_recibida ?? 0,
       cant_remito: cantRemito,
+      cant_pedida: previo?.cant_pedida ?? null,
       tipo_diferencia: tipo,
       motivo_diferencia: motivo,
       ultimo_tipo: previo?.ultimo_tipo ?? null,
@@ -343,6 +379,18 @@ export async function fijarControl(
   pedirSincronizacion();
 }
 
+/**
+ * Recibido menos pedido del producto, sumando todas sus líneas: puede venir en varios lotes.
+ * Nulo si la recepción no tiene orden de compra.
+ */
+export function diferenciaPedido(items: ItemLocal[], productoId: string, conOrden: boolean): number | null {
+  if (!conOrden) return null;
+  const lineas = items.filter((i) => i.producto_id === productoId);
+  return redondear(
+    lineas.reduce((n, i) => n + i.cant_recibida, 0) - lineas.reduce((n, i) => n + (i.cant_pedida ?? 0), 0),
+  );
+}
+
 export interface ChecklistLocal {
   foto_remito: boolean;
   tiene_items: boolean;
@@ -354,18 +402,32 @@ export interface ChecklistLocal {
 /** Misma regla que app_private.checklist en Postgres, sin las firmas. */
 export async function checklistLocal(recepcionId: string): Promise<ChecklistLocal> {
   const items = await db.items.where('recepcion_id').equals(recepcionId).toArray();
+  const conOrden = !!(await db.recepciones.get(recepcionId))?.oc_id;
   const adjuntos = (await db.adjuntos.where('recepcion_id').equals(recepcionId).toArray()).filter(
     (a) => !a.anulado,
   );
   return {
     foto_remito: adjuntos.some((a) => a.tipo === 'REMITO'),
     tiene_items: items.length > 0,
-    cantidades_remito: items.every((i) => i.cant_remito !== null),
+    cantidades_remito: items.every(
+      (i) =>
+        i.cant_remito !== null ||
+        // La línea precargada de un producto que llegó en otras líneas (por lote) no se controla.
+        ((i.cant_pedida ?? null) !== null &&
+          i.cant_recibida === 0 &&
+          items.some((o) => o.producto_id === i.producto_id && o.key !== i.key)),
+    ),
     motivos_diferencias: items.every((i) => {
       const dif = i.cant_remito === null ? 0 : redondear(i.cant_recibida - i.cant_remito);
+      if ((diferenciaPedido(items, i.producto_id, conOrden) ?? 0) !== 0) {
+        const delProducto = items.filter((o) => o.producto_id === i.producto_id);
+        if (!delProducto.some((o) => o.motivo_diferencia?.trim() && o.tipo_diferencia)) return false;
+      }
       if (dif === 0) return true;
       if (!i.motivo_diferencia?.trim() || !i.tipo_diferencia) return false;
-      return i.tipo_diferencia === 'SOBRANTE' ? dif > 0 : dif < 0;
+      if (i.tipo_diferencia === 'SOBRANTE') return dif > 0;
+      if (i.tipo_diferencia === 'FALTANTE' || i.tipo_diferencia === 'RECHAZO') return dif < 0;
+      return true;
     }),
     fotos_manuales: items.every(
       (i) =>
@@ -385,8 +447,11 @@ export async function cerrarRecepcion(
   const ahora = new Date().toISOString();
   const estado = await db.transaction('rw', db.recepciones, db.items, db.cola, async () => {
     const items = await db.items.where('recepcion_id').equals(recepcionId).toArray();
+    const conOrden = !!(await db.recepciones.get(recepcionId))?.oc_id;
     const conDiferencias = items.some(
-      (i) => i.cant_remito !== null && redondear(i.cant_recibida - i.cant_remito) !== 0,
+      (i) =>
+        (i.cant_remito !== null && redondear(i.cant_recibida - i.cant_remito) !== 0) ||
+        (diferenciaPedido(items, i.producto_id, conOrden) ?? 0) !== 0,
     );
     const nuevo = conDiferencias ? ('CERRADA_CON_DIFERENCIAS' as const) : ('CERRADA_OK' as const);
     await db.recepciones.update(recepcionId, { estado: nuevo, cerrada_en: ahora });

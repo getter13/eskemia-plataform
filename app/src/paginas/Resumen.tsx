@@ -9,17 +9,21 @@ import { SelectorProducto } from '../componentes/SelectorProducto';
 import { TecladoCantidad } from '../componentes/Teclado';
 import { db, type ItemLocal, type Producto, type TipoDiferencia } from '../lib/db';
 import { formatoCantidad, formatoFecha, redondear } from '../lib/formato';
-import { agregarAdjunto, checklistLocal, fijarControl, iniciarControl } from '../lib/operaciones';
+import { agregarAdjunto, checklistLocal, diferenciaPedido, fijarControl, iniciarControl } from '../lib/operaciones';
 
 const MOTIVOS: Record<TipoDiferencia, string[]> = {
   FALTANTE: ['No llegó', 'Vino menos de lo indicado', 'Error en el remito'],
   SOBRANTE: ['Enviaron de más', 'Error en el remito'],
   RECHAZO: ['Dañado', 'Vencido o próximo a vencer', 'No coincide con el pedido'],
+  NO_PEDIDO: ['Enviaron sin pedirlo', 'Error del proveedor'],
+  SUSTITUCION: ['Reemplazo de otro producto', 'Otra marca o presentación'],
 };
 const ETIQUETA_TIPO: Record<TipoDiferencia, string> = {
   FALTANTE: 'Faltante',
   SOBRANTE: 'Sobrante',
   RECHAZO: 'Rechazo',
+  NO_PEDIDO: 'No pedido',
+  SUSTITUCION: 'Sustitución',
 };
 
 const diferencia = (i: ItemLocal) =>
@@ -30,15 +34,24 @@ function verboDiferencia(dif: number) {
   return Math.abs(dif) === 1 ? verbo : `${verbo}n`;
 }
 
+function tiposPosibles(dif: number, difPedido: number | null): TipoDiferencia[] {
+  const extras: TipoDiferencia[] = difPedido === null ? [] : ['SUSTITUCION'];
+  const referencia = dif !== 0 ? dif : (difPedido ?? 0);
+  if (referencia > 0) return ['SOBRANTE', ...(difPedido === null ? [] : (['NO_PEDIDO'] as TipoDiferencia[])), ...extras];
+  return ['FALTANTE', 'RECHAZO', ...extras];
+}
+
 function ModalDiferencia({
   item,
+  difPedido,
   alCerrar,
 }: {
   item: ItemLocal;
+  difPedido: number | null;
   alCerrar: () => void;
 }) {
   const dif = diferencia(item)!;
-  const tipos: TipoDiferencia[] = dif > 0 ? ['SOBRANTE'] : ['FALTANTE', 'RECHAZO'];
+  const tipos = tiposPosibles(dif, difPedido);
   const [tipo, setTipo] = useState<TipoDiferencia>(
     item.tipo_diferencia && tipos.includes(item.tipo_diferencia) ? item.tipo_diferencia : tipos[0],
   );
@@ -59,10 +72,18 @@ function ModalDiferencia({
 
   return (
     <Modal titulo={`Diferencia en ${item.producto_nombre}`} alCerrar={alCerrar}>
-      <p>
-        {verboDiferencia(dif)}{' '}
-        <strong>{formatoCantidad(Math.abs(dif), item.tipo_medida)}</strong> respecto del remito.
-      </p>
+      {dif !== 0 && (
+        <p>
+          {verboDiferencia(dif)}{' '}
+          <strong>{formatoCantidad(Math.abs(dif), item.tipo_medida)}</strong> respecto del remito.
+        </p>
+      )}
+      {difPedido !== null && difPedido !== 0 && (
+        <p>
+          {verboDiferencia(difPedido)}{' '}
+          <strong>{formatoCantidad(Math.abs(difPedido), item.tipo_medida)}</strong> respecto de lo pedido.
+        </p>
+      )}
       {tipos.length > 1 && (
         <div className="fila">
           {tipos.map((t) => (
@@ -145,6 +166,12 @@ export function Resumen() {
       <main className="contenido">
         <p className="muted">
           {recepcion.proveedor_nombre} · <span className="mono">{recepcion.nro_remito}</span>
+          {recepcion.oc_numero && (
+            <>
+              {' '}
+              · Orden <span className="mono" data-testid="oc-numero">{recepcion.oc_numero}</span>
+            </>
+          )}
         </p>
         {recepcion.observacion && (
           <p className="aviso-error">
@@ -156,7 +183,9 @@ export function Resumen() {
         <div className="tabla-control">
           {items.map((i) => {
             const dif = diferencia(i);
+            const difPedido = diferenciaPedido(items, i.producto_id, !!recepcion.oc_id);
             const conMotivo = !!i.motivo_diferencia?.trim();
+            const hayDiferencia = dif !== null && (dif !== 0 || (difPedido ?? 0) !== 0);
             return (
               <div className="tarjeta fila-control" key={i.key} data-testid="fila-control">
                 <span className="grupo">
@@ -165,6 +194,16 @@ export function Resumen() {
                   {i.vencimiento && (
                     <span className="mono muted">Vence {formatoFecha(i.vencimiento)}</span>
                   )}
+                  {recepcion.oc_id &&
+                    ((i.cant_pedida ?? null) !== null ? (
+                      <span className="mono muted" data-testid="cant-pedida">
+                        Pedido: {formatoCantidad(i.cant_pedida!, i.tipo_medida)}
+                      </span>
+                    ) : (
+                      items.every((o) => o.producto_id !== i.producto_id || (o.cant_pedida ?? null) === null) && (
+                        <span className="etiqueta etiqueta-alerta">No está en la orden</span>
+                      )
+                    ))}
                 </span>
                 <span className="grupo">
                   <span className="label">Recibido</span>
@@ -177,20 +216,21 @@ export function Resumen() {
                   </button>
                 </span>
                 <span>
-                  {dif === 0 && (
+                  {dif !== null && !hayDiferencia && (
                     <span className="etiqueta">
                       <CheckCircle2 size={16} /> Coincide
                     </span>
                   )}
-                  {dif !== null && dif !== 0 && (
+                  {hayDiferencia && dif !== null && (
                     <button
                       className={`btn ancho ${conMotivo ? 'btn-seleccion' : 'btn-alerta'}`}
                       aria-pressed={conMotivo}
                       onClick={() => setClaveDiferencia(i.key)}
                     >
                       <AlertTriangle size={20} />
-                      {verboDiferencia(dif)} {formatoCantidad(Math.abs(dif), i.tipo_medida)} respecto del
-                      remito
+                      {dif !== 0
+                        ? `${verboDiferencia(dif)} ${formatoCantidad(Math.abs(dif), i.tipo_medida)} respecto del remito`
+                        : `${verboDiferencia(difPedido!)} ${formatoCantidad(Math.abs(difPedido!), i.tipo_medida)} respecto de lo pedido`}
                       {conMotivo ? ` · ${i.motivo_diferencia}` : ' · Indicar motivo'}
                     </button>
                   )}
@@ -273,8 +313,8 @@ export function Resumen() {
           }}
         />
       )}
-      {itemDiferencia && diferencia(itemDiferencia) !== 0 && diferencia(itemDiferencia) !== null && (
-        <ModalDiferencia item={itemDiferencia} alCerrar={() => setClaveDiferencia(null)} />
+      {itemDiferencia && diferencia(itemDiferencia) !== null && (
+        <ModalDiferencia item={itemDiferencia} difPedido={diferenciaPedido(items, itemDiferencia.producto_id, !!recepcion.oc_id)} alCerrar={() => setClaveDiferencia(null)} />
       )}
     </div>
   );

@@ -11,7 +11,7 @@ export type Estado =
   | 'RECHAZADA';
 export type TipoLectura = 'ESCANEO' | 'MANUAL' | 'PESAJE';
 export type TipoAdjunto = 'REMITO' | 'RECHAZO' | 'MANUAL' | 'FIRMA_RECEPTOR' | 'FIRMA_TRANSPORTISTA';
-export type TipoDiferencia = 'FALTANTE' | 'SOBRANTE' | 'RECHAZO';
+export type TipoDiferencia = 'FALTANTE' | 'SOBRANTE' | 'RECHAZO' | 'NO_PEDIDO' | 'SUSTITUCION';
 
 /** sede_id nulo: el permiso vale en todas las sedes. */
 export interface PermisoAsignado {
@@ -57,6 +57,38 @@ export interface Proveedor {
   cuit: string;
 }
 
+/** Un código de barras identifica producto, presentación y cuántas unidades trae. */
+export interface CodigoLocal {
+  codigo_busqueda: string;
+  producto_id: string;
+  presentacion: string;
+  factor: number;
+}
+
+export interface ItemPendiente {
+  producto_id: string;
+  nombre: string;
+  sku: string | null;
+  tipo_medida: TipoMedida;
+  cant_pedida: number;
+  cant_recibida: number;
+  saldo: number;
+}
+
+/** Orden de compra lista para recibir. Sin precios, salvo permiso. */
+export interface PendienteRecepcion {
+  id: string;
+  numero: string;
+  estado: string;
+  proveedor_id: string;
+  proveedor: string;
+  fecha_entrega_estimada: string | null;
+  atrasada: boolean;
+  no_enviada: boolean;
+  se_puede_recibir: boolean;
+  items: ItemPendiente[];
+}
+
 export interface RecepcionLocal {
   id: string;
   tenant_id: string;
@@ -68,6 +100,8 @@ export interface RecepcionLocal {
   abierta_en: string;
   cerrada_en: string | null;
   observacion: string | null;
+  oc_id?: string | null;
+  oc_numero?: string | null;
 }
 
 export interface ItemLocal {
@@ -81,6 +115,8 @@ export interface ItemLocal {
   vencimiento: string | null;
   cant_recibida: number;
   cant_remito: number | null;
+  // Saldo de la orden de compra al abrir la recepción. Nulo: no estaba pedido.
+  cant_pedida?: number | null;
   tipo_diferencia: TipoDiferencia | null;
   motivo_diferencia: string | null;
   // Origen de la última lectura: los botones +/- lo repiten.
@@ -139,6 +175,8 @@ class EskemiaDb extends Dexie {
   adjuntos!: Table<AdjuntoLocal, string>;
   cola!: Table<OpCola, number>;
   meta!: Table<Meta, string>;
+  codigos!: Table<CodigoLocal, string>;
+  pendientes!: Table<PendienteRecepcion, string>;
 
   constructor() {
     super('eskemia-recepcion');
@@ -151,6 +189,10 @@ class EskemiaDb extends Dexie {
       adjuntos: 'client_uuid, recepcion_id, item_key',
       cola: '++seq, recepcion_id, estado',
       meta: 'clave',
+    });
+    this.version(2).stores({
+      codigos: 'codigo_busqueda, producto_id',
+      pendientes: 'id, proveedor_id',
     });
   }
 }

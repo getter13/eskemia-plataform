@@ -113,7 +113,8 @@ export function Bandeja() {
                   <span className="grupo fila-bandeja-datos">
                     <span className="grilla-nombre">{f.proveedor}</span>
                     <span className="muted">
-                      Remito o factura <span className="mono">{f.nro_remito}</span> · {f.sede} ·{' '}
+                      <span className="mono">{f.oc_numero ?? 'Sin OC'}</span> · Remito o factura{' '}
+                      <span className="mono">{f.nro_remito}</span> · {f.sede} ·{' '}
                       {formatoFechaHora(f.abierta_en)}
                     </span>
                     {f.remito_duplicado && (

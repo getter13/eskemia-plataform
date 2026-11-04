@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Camera, Plus, Search } from 'lucide-react';
 import { BotonFoto } from '../componentes/BotonFoto';
 import { Encabezado } from '../componentes/Encabezado';
 import { Modal } from '../componentes/Modal';
-import { db, type Proveedor } from '../lib/db';
-import { formatoCuit } from '../lib/formato';
+import { db, type PendienteRecepcion, type Proveedor } from '../lib/db';
+import { formatoCantidad, formatoCuit } from '../lib/formato';
 import { abrirRecepcion, altaProveedor } from '../lib/operaciones';
 import { useSesion } from '../lib/sesion';
 
@@ -61,6 +61,22 @@ export function NuevaRecepcion() {
   const [foto, setFoto] = useState<Blob | null>(null);
   const [modal, setModal] = useState(false);
   const [guardando, setGuardando] = useState(false);
+  const [parametros] = useSearchParams();
+  const [oc, setOc] = useState<PendienteRecepcion | null>(null);
+  const ordenes = useLiveQuery(() => db.pendientes.toArray(), []) ?? [];
+  const ocPedida = parametros.get('oc');
+
+  // Elegida desde Pendientes: la orden ya dice el proveedor.
+  useEffect(() => {
+    if (!ocPedida) return;
+    void db.pendientes.get(ocPedida).then(async (o) => {
+      if (!o?.se_puede_recibir) return;
+      setOc(o);
+      setProveedor((await db.proveedores.get(o.proveedor_id)) ?? { id: o.proveedor_id, nombre: o.proveedor, cuit: '' });
+    });
+  }, [ocPedida]);
+
+  const ordenesDelProveedor = ordenes.filter((o) => o.se_puede_recibir && o.proveedor_id === proveedor?.id);
 
   const proveedores = useLiveQuery(() => db.proveedores.toArray(), []) ?? [];
   const filtrados = useMemo(() => {
@@ -112,7 +128,10 @@ export function NuevaRecepcion() {
                 className="tarjeta tarjeta-tactil"
                 aria-pressed={proveedor?.id === p.id}
                 key={p.id}
-                onClick={() => setProveedor(p)}
+                onClick={() => {
+                  setProveedor(p);
+                  setOc(null);
+                }}
               >
                 <span className="grupo">
                   <strong>{p.nombre}</strong>
@@ -123,6 +142,42 @@ export function NuevaRecepcion() {
           </div>
           {filtrados.length === 0 && <p className="muted">No hay proveedores con esa búsqueda.</p>}
         </section>
+
+        {ordenesDelProveedor.length > 0 && (
+          <section className="grupo" data-testid="elegir-oc">
+            <h2>Orden de compra</h2>
+            <p className="muted">Elegí la orden para recibir sobre sus cantidades y detectar las diferencias.</p>
+            <div className="grilla">
+              {ordenesDelProveedor.map((o) => (
+                <button
+                  className="tarjeta tarjeta-tactil"
+                  aria-pressed={oc?.id === o.id}
+                  data-testid="opcion-oc"
+                  key={o.id}
+                  onClick={() => setOc(o)}
+                >
+                  <span className="grupo">
+                    <strong className="mono">{o.numero}</strong>
+                    {o.items
+                      .filter((i) => i.saldo > 0)
+                      .map((i) => (
+                        <span className="muted" key={i.producto_id}>
+                          {i.nombre}: {formatoCantidad(i.saldo, i.tipo_medida)}
+                        </span>
+                      ))}
+                  </span>
+                </button>
+              ))}
+              <button
+                className="tarjeta tarjeta-tactil"
+                aria-pressed={oc === null}
+                onClick={() => setOc(null)}
+              >
+                <strong>Sin orden de compra</strong>
+              </button>
+            </div>
+          </section>
+        )}
 
         <section className="grupo">
           <h2>2. Número de remito o factura</h2>
@@ -161,6 +216,7 @@ export function NuevaRecepcion() {
               proveedor_nombre: proveedor.nombre,
               nro_remito: nroRemito.trim(),
               foto,
+              oc,
             });
             navegar(`/recepcion/${id}/carga`, { replace: true });
           }}

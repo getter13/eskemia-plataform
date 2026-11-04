@@ -2,7 +2,7 @@
 // El orden importa: una lectura no puede llegar antes que su recepción.
 // Reintentar es seguro porque las RPC son idempotentes (client_uuid).
 import { aGtin14 } from './codigos';
-import { db, type Estado, type ItemLocal, type OpCola, type Producto, type TipoLectura } from './db';
+import { db, leerMeta, type Estado, type ItemLocal, type OpCola, type PendienteRecepcion, type Producto, type TipoLectura } from './db';
 import { BUCKET_ADJUNTOS, supabase } from './supabase';
 
 const INTERVALO_MS = 20_000;
@@ -173,21 +173,58 @@ async function traerTodo<T>(tabla: string, columnas: string): Promise<T[]> {
 }
 
 export async function traerCatalogos() {
-  const [categorias, productos, proveedores] = await Promise.all([
+  const [categorias, productos, proveedores, codigos] = await Promise.all([
     traerTodo<{ id: string; nombre: string; orden: number }>('categorias', 'id,nombre,orden'),
     traerTodo<Omit<Producto, 'gtin14'>>(
       'productos',
       'id,gtin,nombre,tipo_medida,requiere_lote,requiere_vencimiento,pendiente_validacion,categoria_id',
     ),
     traerTodo<{ id: string; nombre: string; cuit: string }>('proveedores', 'id,nombre,cuit'),
+    traerTodo<{
+      producto_id: string;
+      codigo_busqueda: string;
+      presentaciones: { nombre: string; factor: number } | null;
+    }>('producto_codigos', 'producto_id,codigo_busqueda,presentaciones(nombre,factor)'),
   ]);
-  await db.transaction('rw', db.categorias, db.productos, db.proveedores, async () => {
+  await db.transaction('rw', db.categorias, db.productos, db.proveedores, db.codigos, async () => {
     await db.categorias.clear();
     await db.categorias.bulkPut(categorias);
     await db.productos.bulkPut(
       productos.map((p) => ({ ...p, gtin14: p.gtin ? aGtin14(p.gtin) : null })),
     );
     await db.proveedores.bulkPut(proveedores);
+    await db.codigos.clear();
+    await db.codigos.bulkPut(
+      codigos.map((c) => ({
+        codigo_busqueda: c.codigo_busqueda,
+        producto_id: c.producto_id,
+        presentacion: c.presentaciones?.nombre ?? '',
+        factor: Number(c.presentaciones?.factor ?? 1),
+      })),
+    );
+  });
+}
+
+/** Quedan guardadas: el kiosco tiene que poder recibir una orden aunque se corte la señal. */
+async function traerPendientes() {
+  const sede = await leerMeta<string>('sede_actual');
+  if (!sede) return;
+  const { data, error } = await supabase.rpc('pendientes_recepcion', { p_sede_id: sede });
+  // Sin el permiso no hay lista: quien solo compra también sincroniza.
+  if (error?.code === '42501') return;
+  if (error) throw clasificar(error);
+  const filas = ((data ?? []) as PendienteRecepcion[]).map((p) => ({
+    ...p,
+    items: p.items.map((i) => ({
+      ...i,
+      cant_pedida: Number(i.cant_pedida),
+      cant_recibida: Number(i.cant_recibida),
+      saldo: Number(i.saldo),
+    })),
+  }));
+  await db.transaction('rw', db.pendientes, async () => {
+    await db.pendientes.clear();
+    await db.pendientes.bulkPut(filas);
   });
 }
 
@@ -201,6 +238,8 @@ interface FilaRecepcion {
   abierta_en: string;
   cerrada_en: string | null;
   observacion: string | null;
+  oc_id: string | null;
+  oc_numero: string | null;
   proveedores: { nombre: string } | null;
 }
 
@@ -209,7 +248,7 @@ async function traerRecepciones() {
   const { data, error } = await supabase
     .from('recepciones')
     .select(
-      'id,tenant_id,sede_id,estado,proveedor_id,nro_remito,abierta_en,cerrada_en,observacion,proveedores(nombre)',
+      'id,tenant_id,sede_id,estado,proveedor_id,nro_remito,abierta_en,cerrada_en,observacion,oc_id,oc_numero,proveedores(nombre)',
     )
     .in('estado', ESTADOS_ABIERTOS);
   if (error) throw clasificar(error);
@@ -236,7 +275,7 @@ async function hidratar(f: FilaRecepcion) {
     supabase
       .from('recepcion_items')
       .select(
-        'id,producto_id,lote,vencimiento,cant_recibida,cant_remito,tipo_diferencia,motivo_diferencia,creado_en,productos(nombre,tipo_medida)',
+        'id,producto_id,lote,vencimiento,cant_recibida,cant_remito,cant_pedida,tipo_diferencia,motivo_diferencia,creado_en,productos(nombre,tipo_medida)',
       )
       .eq('recepcion_id', f.id),
     supabase
@@ -263,6 +302,7 @@ async function hidratar(f: FilaRecepcion) {
     vencimiento: string | null;
     cant_recibida: number;
     cant_remito: number | null;
+    cant_pedida: number | null;
     tipo_diferencia: ItemLocal['tipo_diferencia'];
     motivo_diferencia: string | null;
     creado_en: string;
@@ -282,6 +322,7 @@ async function hidratar(f: FilaRecepcion) {
       vencimiento: i.vencimiento,
       cant_recibida: Number(i.cant_recibida),
       cant_remito: i.cant_remito === null ? null : Number(i.cant_remito),
+      cant_pedida: i.cant_pedida === null ? null : Number(i.cant_pedida),
       tipo_diferencia: i.tipo_diferencia,
       motivo_diferencia: i.motivo_diferencia,
       ultimo_tipo: u?.tipo ?? null,
@@ -305,6 +346,8 @@ async function hidratar(f: FilaRecepcion) {
       abierta_en: f.abierta_en,
       cerrada_en: f.cerrada_en,
       observacion: f.observacion,
+      oc_id: f.oc_id,
+      oc_numero: f.oc_numero,
     });
     await db.items.where('recepcion_id').equals(f.id).delete();
     await db.items.bulkPut(locales);
@@ -336,6 +379,7 @@ export async function sincronizar() {
     if (await vaciarCola()) {
       await traerCatalogos();
       await traerRecepciones();
+      await traerPendientes();
     }
   } catch (e) {
     console.warn('Sincronización pendiente:', e);
