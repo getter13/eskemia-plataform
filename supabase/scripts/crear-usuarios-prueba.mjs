@@ -31,6 +31,24 @@ const USUARIOS = [
     sede: null,
     variable: 'SEED_ADMIN_PASSWORD',
   },
+  {
+    id: '00000000-0000-4000-c000-000000000003',
+    email: 'comprador@eskemia.test',
+    rol: 'operario',
+    nombreRol: 'Comprador',
+    nombre: 'Comprador de prueba',
+    sede: SEDE,
+    variable: 'SEED_COMPRADOR_PASSWORD',
+  },
+  {
+    id: '00000000-0000-4000-c000-000000000004',
+    email: 'encargado@eskemia.test',
+    rol: 'supervisor',
+    nombreRol: 'Encargado de compras',
+    nombre: 'Encargado de prueba',
+    sede: SEDE,
+    variable: 'SEED_ENCARGADO_PASSWORD',
+  },
 ];
 
 const envPath = '.env.local';

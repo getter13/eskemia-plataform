@@ -38,6 +38,9 @@ returns void language sql as $$
         nivel_requerido = excluded.nivel_requerido, activa = true
 $$;
 
+-- Las reglas demo no cuentan: esto también se deshace con el ROLLBACK.
+delete from public.reglas_aprobacion;
+
 do $$
 declare
   t constant uuid := '00000000-0000-4000-8000-000000000001';

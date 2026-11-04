@@ -18,6 +18,59 @@ insert into public.categorias (id, tenant_id, rubro_id, nombre, orden) values
   ('00000000-0000-4000-f100-000000000004', '00000000-0000-4000-8000-000000000001', '00000000-0000-4000-f000-000000000003', 'Hogar', 4)
 on conflict (id) do nothing;
 
+-- Completa el catálogo gastronómico: rubro nuevo, categorías y 20 productos más, hasta 40.
+insert into public.rubros (id, tenant_id, nombre, orden) values
+  ('00000000-0000-4000-f000-000000000004', '00000000-0000-4000-8000-000000000001', 'Descartables (demo)', 4)
+on conflict (id) do nothing;
+
+insert into public.categorias (id, tenant_id, rubro_id, nombre, orden) values
+  ('00000000-0000-4000-f100-000000000005', '00000000-0000-4000-8000-000000000001', '00000000-0000-4000-f000-000000000001', 'Proteínas', 5),
+  ('00000000-0000-4000-f100-000000000006', '00000000-0000-4000-8000-000000000001', '00000000-0000-4000-f000-000000000001', 'Verdulería', 6),
+  ('00000000-0000-4000-f100-000000000007', '00000000-0000-4000-8000-000000000001', '00000000-0000-4000-f000-000000000002', 'Con alcohol', 7),
+  ('00000000-0000-4000-f100-000000000008', '00000000-0000-4000-8000-000000000001', '00000000-0000-4000-f000-000000000004', 'Salón', 8)
+on conflict (id) do nothing;
+
+-- Dígito verificador de un GTIN: el código tiene que ser válido para poder escanearlo.
+create function pg_temp.con_digito(p_base text)
+returns text
+language sql
+immutable
+as $$
+  select p_base || ((10 - sum(
+    substr(reverse(p_base), n, 1)::int * case when n % 2 = 1 then 3 else 1 end
+  )::int % 10) % 10)::text
+  from generate_series(1, length(p_base)) as n
+$$;
+
+insert into public.productos (id, tenant_id, categoria_id, gtin, nombre, tipo_medida)
+select
+  ('00000000-0000-4000-b000-0000000000' || lpad(d.n::text, 2, '0'))::uuid,
+  '00000000-0000-4000-8000-000000000001',
+  ('00000000-0000-4000-f100-00000000000' || d.categoria)::uuid,
+  pg_temp.con_digito('7799000' || lpad((d.n * 10)::text, 5, '0')),
+  d.nombre,
+  d.medida::public.tipo_medida
+from (values
+  (21, 5, 'Carne picada', 'PESO'), (22, 5, 'Pollo entero', 'PESO'),
+  (23, 5, 'Milanesa de nalga', 'PESO'), (24, 5, 'Filet de merluza', 'PESO'),
+  (25, 6, 'Papa', 'PESO'), (26, 6, 'Cebolla', 'PESO'),
+  (27, 6, 'Tomate perita', 'PESO'), (28, 6, 'Lechuga', 'PESO'),
+  (29, 1, 'Polenta', 'UNIDAD'), (30, 1, 'Lentejas', 'UNIDAD'),
+  (31, 1, 'Mayonesa', 'UNIDAD'), (32, 1, 'Vinagre', 'UNIDAD'),
+  (33, 3, 'Jugo de naranja', 'UNIDAD'), (34, 3, 'Soda', 'UNIDAD'),
+  (35, 7, 'Cerveza', 'UNIDAD'), (36, 7, 'Vino tinto', 'UNIDAD'),
+  (37, 4, 'Esponja', 'UNIDAD'), (38, 4, 'Bolsa de residuos', 'UNIDAD'),
+  (39, 8, 'Servilletas', 'UNIDAD'), (40, 8, 'Vasos descartables', 'UNIDAD')
+) as d (n, categoria, nombre, medida)
+on conflict (id) do nothing;
+
+-- Reglas: Proteínas siempre, Con alcohol por monto, Limpieza nunca.
+insert into public.reglas_aprobacion (tenant_id, alcance, alcance_id, modo, monto_umbral, nivel_requerido) values
+  ('00000000-0000-4000-8000-000000000001', 'CATEGORIA', '00000000-0000-4000-f100-000000000005', 'SIEMPRE', null, 1),
+  ('00000000-0000-4000-8000-000000000001', 'CATEGORIA', '00000000-0000-4000-f100-000000000007', 'POR_MONTO', 50000, 2),
+  ('00000000-0000-4000-8000-000000000001', 'RUBRO', '00000000-0000-4000-f000-000000000003', 'NUNCA', null, 0)
+on conflict (tenant_id, alcance, alcance_id) do nothing;
+
 update public.productos p
 set categoria_id = c.categoria::uuid
 from (values
@@ -61,6 +114,14 @@ where p.id in (
   '00000000-0000-4000-b000-000000000014'
 )
 on conflict (producto_id, nombre) do nothing;
+
+-- El código de la caja: escanearla suma 12 unidades contra la orden.
+insert into public.producto_codigos (tenant_id, producto_id, presentacion_id, codigo, tipo)
+select p.tenant_id, p.id, pre.id, pg_temp.con_digito('1' || left(p.gtin, 12)), 'DUN14'
+from public.productos p
+join public.presentaciones pre on pre.producto_id = p.id and pre.nombre = 'Caja x 12'
+where p.id::text like '00000000-0000-4000-b000-%' and p.gtin is not null
+on conflict (tenant_id, codigo_busqueda) do nothing;
 
 -- Todos tienen un proveedor; cada tercero tiene un segundo, para probar la elección en el pedido.
 with productos_demo as (

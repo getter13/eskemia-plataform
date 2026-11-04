@@ -94,7 +94,9 @@ export function Inicio() {
                           <AlertTriangle size={16} /> Atrasada
                         </span>
                       )}
-                      {o.no_enviada && <span className="etiqueta etiqueta-alerta">No enviada</span>}
+                      {(o.estado === 'APROBADA' || o.estado === 'ENVIADA') && (
+                        <span className="etiqueta etiqueta-alerta">No recibido</span>
+                      )}
                       {ETIQUETA_PENDIENTE[o.estado] && (
                         <span className="etiqueta etiqueta-neutra">{ETIQUETA_PENDIENTE[o.estado]}</span>
                       )}
