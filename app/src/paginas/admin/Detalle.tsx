@@ -287,18 +287,22 @@ export function Detalle() {
                           : formatoCantidad(Number(i.cant_pedida), i.productos.tipo_medida)}
                       </Celda>
                     )}
-                    <Celda titulo="Remito">
-                      {i.cant_remito === null
-                        ? '—'
-                        : formatoCantidad(Number(i.cant_remito), i.productos.tipo_medida)}
-                    </Celda>
+                    {!r.oc_id && (
+                      <Celda titulo="Remito">
+                        {i.cant_remito === null
+                          ? '—'
+                          : formatoCantidad(Number(i.cant_remito), i.productos.tipo_medida)}
+                      </Celda>
+                    )}
                     <Celda titulo="Recibido">
                       {formatoCantidad(Number(i.cant_recibida), i.productos.tipo_medida)}
                     </Celda>
                     <Celda titulo="Diferencia">
-                      {i.diferencia === null
-                        ? '—'
-                        : formatoCantidad(Number(i.diferencia), i.productos.tipo_medida)}
+                      {r.oc_id
+                        ? formatoCantidad(Number(i.cant_recibida) - Number(i.cant_pedida ?? 0), i.productos.tipo_medida)
+                        : i.diferencia === null
+                          ? '—'
+                          : formatoCantidad(Number(i.diferencia), i.productos.tipo_medida)}
                     </Celda>
                     {i.lote && <Celda titulo="Lote">{i.lote}</Celda>}
                     {i.vencimiento && <Celda titulo="Vencimiento">{formatoFecha(i.vencimiento)}</Celda>}

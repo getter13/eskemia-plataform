@@ -50,7 +50,7 @@ function ModalDiferencia({
   difPedido: number | null;
   alCerrar: () => void;
 }) {
-  const dif = diferencia(item)!;
+  const dif = diferencia(item) ?? 0;
   const tipos = tiposPosibles(dif, difPedido);
   const [tipo, setTipo] = useState<TipoDiferencia>(
     item.tipo_diferencia && tipos.includes(item.tipo_diferencia) ? item.tipo_diferencia : tipos[0],
@@ -63,7 +63,7 @@ function ModalDiferencia({
       { id: item.producto_id, nombre: item.producto_nombre, tipo_medida: item.tipo_medida },
       item.lote,
       item.vencimiento,
-      item.cant_remito!,
+      item.cant_remito,
       tipo,
       motivo,
     );
@@ -178,14 +178,23 @@ export function Resumen() {
             <AlertTriangle size={20} /> Observación: {recepcion.observacion}
           </p>
         )}
-        <p>Cargá la cantidad que figura en el remito para cada producto.</p>
+        <p>
+          {recepcion.oc_id
+            ? 'Lo recibido se compara con lo pedido: indicá el motivo de cada diferencia.'
+            : 'Cargá la cantidad que figura en el remito para cada producto.'}
+        </p>
 
         <div className="tabla-control">
           {items.map((i) => {
             const dif = diferencia(i);
             const difPedido = diferenciaPedido(items, i.producto_id, !!recepcion.oc_id);
-            const conMotivo = !!i.motivo_diferencia?.trim();
-            const hayDiferencia = dif !== null && (dif !== 0 || (difPedido ?? 0) !== 0);
+            // Con orden se controla por producto: un motivo cubre todos sus lotes.
+            const motivo = recepcion.oc_id
+              ? items.find((o) => o.producto_id === i.producto_id && o.motivo_diferencia?.trim())?.motivo_diferencia
+              : i.motivo_diferencia?.trim();
+            const conMotivo = !!motivo;
+            const hayDiferencia = recepcion.oc_id ? (difPedido ?? 0) !== 0 : dif !== null && dif !== 0;
+            const controlado = recepcion.oc_id ? !hayDiferencia : dif === 0;
             return (
               <div className="tarjeta fila-control" key={i.key} data-testid="fila-control">
                 <span className="grupo">
@@ -195,43 +204,46 @@ export function Resumen() {
                     <span className="mono muted">Vence {formatoFecha(i.vencimiento)}</span>
                   )}
                   {recepcion.oc_id &&
-                    ((i.cant_pedida ?? null) !== null ? (
-                      <span className="mono muted" data-testid="cant-pedida">
-                        Pedido: {formatoCantidad(i.cant_pedida!, i.tipo_medida)}
-                      </span>
-                    ) : (
-                      items.every((o) => o.producto_id !== i.producto_id || (o.cant_pedida ?? null) === null) && (
-                        <span className="etiqueta etiqueta-alerta">No está en la orden</span>
-                      )
-                    ))}
+                    items.every((o) => o.producto_id !== i.producto_id || (o.cant_pedida ?? null) === null) && (
+                      <span className="etiqueta etiqueta-alerta">No está en la orden</span>
+                    )}
                 </span>
                 <span className="grupo">
                   <span className="label">Recibido</span>
                   <span className="mono">{formatoCantidad(i.cant_recibida, i.tipo_medida)}</span>
                 </span>
-                <span className="grupo">
-                  <span className="label">Remito</span>
-                  <button className="btn" onClick={() => setTeclado(i)}>
-                    {i.cant_remito === null ? 'Cargar' : formatoCantidad(i.cant_remito, i.tipo_medida)}
-                  </button>
-                </span>
+                {recepcion.oc_id ? (
+                  <span className="grupo">
+                    <span className="label">Pedido</span>
+                    <span className="mono" data-testid="cant-pedida">
+                      {(i.cant_pedida ?? null) === null ? '—' : formatoCantidad(i.cant_pedida!, i.tipo_medida)}
+                    </span>
+                  </span>
+                ) : (
+                  <span className="grupo">
+                    <span className="label">Remito</span>
+                    <button className="btn" onClick={() => setTeclado(i)}>
+                      {i.cant_remito === null ? 'Cargar' : formatoCantidad(i.cant_remito, i.tipo_medida)}
+                    </button>
+                  </span>
+                )}
                 <span>
-                  {dif !== null && !hayDiferencia && (
+                  {controlado && (
                     <span className="etiqueta">
                       <CheckCircle2 size={16} /> Coincide
                     </span>
                   )}
-                  {hayDiferencia && dif !== null && (
+                  {hayDiferencia && (
                     <button
                       className={`btn ancho ${conMotivo ? 'btn-seleccion' : 'btn-alerta'}`}
                       aria-pressed={conMotivo}
                       onClick={() => setClaveDiferencia(i.key)}
                     >
                       <AlertTriangle size={20} />
-                      {dif !== 0
-                        ? `${verboDiferencia(dif)} ${formatoCantidad(Math.abs(dif), i.tipo_medida)} respecto del remito`
-                        : `${verboDiferencia(difPedido!)} ${formatoCantidad(Math.abs(difPedido!), i.tipo_medida)} respecto de lo pedido`}
-                      {conMotivo ? ` · ${i.motivo_diferencia}` : ' · Indicar motivo'}
+                      {recepcion.oc_id
+                        ? `${verboDiferencia(difPedido!)} ${formatoCantidad(Math.abs(difPedido!), i.tipo_medida)} respecto de lo pedido`
+                        : `${verboDiferencia(dif!)} ${formatoCantidad(Math.abs(dif!), i.tipo_medida)} respecto del remito`}
+                      {conMotivo ? ` · ${motivo}` : ' · Indicar motivo'}
                     </button>
                   )}
                 </span>
@@ -240,11 +252,13 @@ export function Resumen() {
           })}
         </div>
 
-        <div>
-          <button className="btn" onClick={() => setSelector(true)}>
-            <Plus size={24} /> Agregar producto del remito que no llegó
-          </button>
-        </div>
+        {!recepcion.oc_id && (
+          <div>
+            <button className="btn" onClick={() => setSelector(true)}>
+              <Plus size={24} /> Agregar producto del remito que no llegó
+            </button>
+          </div>
+        )}
 
         {faltan.length > 0 && (
           <ul className="lista-faltantes" data-testid="faltantes">
@@ -313,7 +327,7 @@ export function Resumen() {
           }}
         />
       )}
-      {itemDiferencia && diferencia(itemDiferencia) !== null && (
+      {itemDiferencia && (recepcion.oc_id || diferencia(itemDiferencia) !== null) && (
         <ModalDiferencia item={itemDiferencia} difPedido={diferenciaPedido(items, itemDiferencia.producto_id, !!recepcion.oc_id)} alCerrar={() => setClaveDiferencia(null)} />
       )}
     </div>

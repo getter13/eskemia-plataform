@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Link, useNavigate } from 'react-router-dom';
-import { AlertTriangle, ChevronRight, ClipboardList, CloudOff, FileUp, LogOut, RefreshCw, ScanLine, ShieldCheck, Users } from 'lucide-react';
+import { AlertTriangle, ChevronRight, ClipboardList, FileText, CloudOff, FileUp, LogOut, RefreshCw, ScanLine, ShieldCheck, Users } from 'lucide-react';
 import { NavCompras } from '../../componentes/compras';
 import { formatoMoneda } from '../../lib/catalogo';
 import { db, tienePermiso } from '../../lib/db';
@@ -100,6 +100,7 @@ export function Pedidos() {
 const ACCESOS = [
   { permiso: 'recepcion.recepcion.operar', ruta: '/?kiosco=1', etiqueta: 'Kiosco de recepción', Icono: ScanLine },
   { permiso: 'recepcion.recepcion.validar', ruta: '/admin', etiqueta: 'Bandeja de recepciones', Icono: ClipboardList },
+  { permiso: 'compras.oc.ver_todas', ruta: '/compras/oc', etiqueta: 'Órdenes de compra', Icono: FileText },
   { permiso: 'compras.aprobacion.configurar', ruta: '/compras/reglas', etiqueta: 'Reglas de aprobación', Icono: ShieldCheck },
   { permiso: 'compras.catalogo.gestionar', ruta: '/admin/importar', etiqueta: 'Importar catálogo', Icono: FileUp },
   { permiso: 'admin.usuarios.gestionar', ruta: '/admin/roles', etiqueta: 'Usuarios y roles', Icono: Users },

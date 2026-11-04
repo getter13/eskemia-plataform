@@ -4,6 +4,13 @@
 
 begin;
 
+-- Las órdenes demo no cuentan: esto también se deshace con el ROLLBACK.
+update public.recepciones set oc_id = null where oc_id is not null;
+delete from public.oc_items;
+delete from public.ordenes_compra;
+delete from public.pedido_items;
+delete from public.pedidos_compra;
+
 do $$
 declare
   t constant uuid := '00000000-0000-4000-8000-000000000001';

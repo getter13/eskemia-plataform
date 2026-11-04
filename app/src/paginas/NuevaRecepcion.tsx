@@ -6,7 +6,7 @@ import { BotonFoto } from '../componentes/BotonFoto';
 import { Encabezado } from '../componentes/Encabezado';
 import { Modal } from '../componentes/Modal';
 import { db, type PendienteRecepcion, type Proveedor } from '../lib/db';
-import { formatoCantidad, formatoCuit } from '../lib/formato';
+import { formatoCuit } from '../lib/formato';
 import { abrirRecepcion, altaProveedor } from '../lib/operaciones';
 import { useSesion } from '../lib/sesion';
 
@@ -66,17 +66,24 @@ export function NuevaRecepcion() {
   const ordenes = useLiveQuery(() => db.pendientes.toArray(), []) ?? [];
   const ocPedida = parametros.get('oc');
 
-  // Elegida desde Pendientes: la orden ya dice el proveedor.
+  // Elegida desde Pendientes: la orden ya dice el proveedor, y no se puede cambiar.
+  const [buscandoOc, setBuscandoOc] = useState(ocPedida !== null);
+  const [ocFija, setOcFija] = useState(false);
   useEffect(() => {
     if (!ocPedida) return;
     void db.pendientes.get(ocPedida).then(async (o) => {
-      if (!o?.se_puede_recibir) return;
-      setOc(o);
-      setProveedor((await db.proveedores.get(o.proveedor_id)) ?? { id: o.proveedor_id, nombre: o.proveedor, cuit: '' });
+      if (o?.se_puede_recibir) {
+        setOc(o);
+        setOcFija(true);
+        setProveedor((await db.proveedores.get(o.proveedor_id)) ?? { id: o.proveedor_id, nombre: o.proveedor, cuit: '' });
+      }
+      setBuscandoOc(false);
     });
   }, [ocPedida]);
 
   const ordenesDelProveedor = ordenes.filter((o) => o.se_puede_recibir && o.proveedor_id === proveedor?.id);
+  // Con la orden fija, el proveedor ya está resuelto y arranca por el remito.
+  const pasoRemito = ocFija ? 1 : 2;
 
   const proveedores = useLiveQuery(() => db.proveedores.toArray(), []) ?? [];
   const filtrados = useMemo(() => {
@@ -106,7 +113,16 @@ export function NuevaRecepcion() {
         <h2>Nueva recepción</h2>
       </Encabezado>
       <main className="contenido estrecho">
-        <section className="grupo">
+        {ocFija && oc && (
+          <section className="tarjeta grupo" data-testid="oc-elegida">
+            <strong>{oc.proveedor}</strong>
+            <span className="mono muted">{oc.numero}</span>
+          </section>
+        )}
+
+        {!ocFija && !buscandoOc && (
+        <>
+        <section className="grupo" data-testid="elegir-proveedor">
           <h2>1. Proveedor</h2>
           <div className="fila">
             <Search size={24} />
@@ -156,16 +172,7 @@ export function NuevaRecepcion() {
                   key={o.id}
                   onClick={() => setOc(o)}
                 >
-                  <span className="grupo">
-                    <strong className="mono">{o.numero}</strong>
-                    {o.items
-                      .filter((i) => i.saldo > 0)
-                      .map((i) => (
-                        <span className="muted" key={i.producto_id}>
-                          {i.nombre}: {formatoCantidad(i.saldo, i.tipo_medida)}
-                        </span>
-                      ))}
-                  </span>
+                  <strong className="mono">{o.numero}</strong>
                 </button>
               ))}
               <button
@@ -178,9 +185,11 @@ export function NuevaRecepcion() {
             </div>
           </section>
         )}
+        </>
+        )}
 
         <section className="grupo">
-          <h2>2. Número de remito o factura</h2>
+          <h2>{pasoRemito}. Número de remito o factura</h2>
           <input
             className="campo"
             aria-label="Número de remito o factura"
@@ -190,7 +199,7 @@ export function NuevaRecepcion() {
         </section>
 
         <section className="grupo">
-          <h2>3. Foto del remito o factura</h2>
+          <h2>{pasoRemito + 1}. Foto del remito o factura</h2>
           <p className="muted">Es obligatoria: queda como respaldo de la recepción.</p>
           {vistaPrevia && <img className="vista-foto" src={vistaPrevia} alt="Foto del documento" />}
           <div>

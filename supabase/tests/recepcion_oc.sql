@@ -11,6 +11,13 @@
 
 begin;
 
+-- Las órdenes demo no cuentan: esto también se deshace con el ROLLBACK.
+update public.recepciones set oc_id = null where oc_id is not null;
+delete from public.oc_items;
+delete from public.ordenes_compra;
+delete from public.pedido_items;
+delete from public.pedidos_compra;
+
 create function pg_temp.rol_de(p_user uuid, p_rol text)
 returns void language plpgsql as $$
 begin

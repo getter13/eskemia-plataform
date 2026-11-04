@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
-import { AlertTriangle, ChevronRight, ClipboardList, FileUp, LogOut, PackagePlus, ShieldCheck, ShoppingCart } from 'lucide-react';
+import { AlertTriangle, ChevronRight, ClipboardList, FileText, FileUp, LogOut, PackagePlus, ShieldCheck, ShoppingCart } from 'lucide-react';
 import { Encabezado } from '../componentes/Encabezado';
 import { Modal } from '../componentes/Modal';
 import { db, tienePermiso, type RecepcionLocal } from '../lib/db';
@@ -144,6 +144,11 @@ export function Inicio() {
         {puedeComprar && (
           <button className="btn" onClick={() => navegar('/compras')}>
             <ShoppingCart size={20} /> Compras
+          </button>
+        )}
+        {tienePermiso(perfil, 'compras.oc.ver_todas') && (
+          <button className="btn" onClick={() => navegar('/compras/oc')}>
+            <FileText size={20} /> Órdenes de compra
           </button>
         )}
         {tienePermiso(perfil, 'compras.catalogo.gestionar') && (

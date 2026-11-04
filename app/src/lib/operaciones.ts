@@ -333,7 +333,7 @@ export async function fijarControl(
   producto: Pick<Producto, 'id' | 'nombre' | 'tipo_medida'>,
   lote: string | null,
   vencimiento: string | null,
-  cantRemito: number,
+  cantRemito: number | null,
   tipo: TipoDiferencia | null,
   motivo: string | null,
 ) {
@@ -409,14 +409,8 @@ export async function checklistLocal(recepcionId: string): Promise<ChecklistLoca
   return {
     foto_remito: adjuntos.some((a) => a.tipo === 'REMITO'),
     tiene_items: items.length > 0,
-    cantidades_remito: items.every(
-      (i) =>
-        i.cant_remito !== null ||
-        // La línea precargada de un producto que llegó en otras líneas (por lote) no se controla.
-        ((i.cant_pedida ?? null) !== null &&
-          i.cant_recibida === 0 &&
-          items.some((o) => o.producto_id === i.producto_id && o.key !== i.key)),
-    ),
+    // Con orden de compra no se carga remito: se compara contra lo pedido.
+    cantidades_remito: conOrden || items.every((i) => i.cant_remito !== null),
     motivos_diferencias: items.every((i) => {
       const dif = i.cant_remito === null ? 0 : redondear(i.cant_recibida - i.cant_remito);
       if ((diferenciaPedido(items, i.producto_id, conOrden) ?? 0) !== 0) {

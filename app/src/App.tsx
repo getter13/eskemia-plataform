@@ -19,17 +19,21 @@ const Marketplace = lazy(() => import('./paginas/compras/Marketplace').then((m) 
 const Pedido = lazy(() => import('./paginas/compras/Pedido').then((m) => ({ default: m.Pedido })));
 const Pedidos = lazy(() => import('./paginas/compras/Secciones').then((m) => ({ default: m.Pedidos })));
 const Aprobaciones = lazy(() => import('./paginas/compras/Aprobaciones').then((m) => ({ default: m.Aprobaciones })));
+const Tablero = lazy(() => import('./paginas/compras/Tablero').then((m) => ({ default: m.Tablero })));
 const Orden = lazy(() => import('./paginas/compras/Orden').then((m) => ({ default: m.Orden })));
 const PerfilCompras = lazy(() => import('./paginas/compras/Secciones').then((m) => ({ default: m.PerfilCompras })));
 
-function Requiere({ permiso, children }: { permiso: string; children: ReactNode }) {
+/** Alcanza con tener uno de los permisos. */
+function Requiere({ permiso, children }: { permiso: string | string[]; children: ReactNode }) {
   const { perfil } = useSesion();
-  return tienePermiso(perfil, permiso) ? children : <Navigate to="/" replace />;
+  const permisos = Array.isArray(permiso) ? permiso : [permiso];
+  return permisos.some((p) => tienePermiso(perfil, p)) ? children : <Navigate to="/" replace />;
 }
 
 const OPERAR = 'recepcion.recepcion.operar';
 const VALIDAR = 'recepcion.recepcion.validar';
 const CATALOGO = 'compras.catalogo.ver';
+const VER_ORDENES = 'compras.oc.ver_todas';
 
 function Rutas() {
   const { cargando, session, perfil, errorPerfil } = useSesion();
@@ -67,7 +71,11 @@ function Rutas() {
       <Route path="/compras/pedido" element={<Requiere permiso={CATALOGO}><Pedido /></Requiere>} />
       <Route path="/compras/pedidos" element={<Requiere permiso={CATALOGO}><Pedidos /></Requiere>} />
       <Route path="/compras/aprobaciones" element={<Requiere permiso="compras.oc.aprobar"><Aprobaciones /></Requiere>} />
-      <Route path="/compras/oc/:id" element={<Requiere permiso={CATALOGO}><Orden /></Requiere>} />
+      <Route path="/compras/oc" element={<Requiere permiso={VER_ORDENES}><Tablero /></Requiere>} />
+      <Route
+        path="/compras/oc/:id"
+        element={<Requiere permiso={[CATALOGO, VER_ORDENES, 'compras.oc.aprobar']}><Orden /></Requiere>}
+      />
       <Route path="/compras/perfil" element={<Requiere permiso={CATALOGO}><PerfilCompras /></Requiere>} />
       <Route
         path="/compras/reglas"

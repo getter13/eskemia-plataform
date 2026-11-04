@@ -1241,3 +1241,8 @@ body,
   background: var(--surface-200);
   overflow-wrap: anywhere;
 }
+
+/* Tablero de órdenes */
+.mk-etiquetas {
+  gap: var(--space-2);
+}
