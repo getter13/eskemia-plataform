@@ -97,6 +97,27 @@ eventos (append-only: entidad, entidad_id, accion, payload jsonb, usuario_id, di
 - Contraste de texto ≥ 4.5:1. Estados nunca solo por color.
 - Kiosco: objetivos táctiles ≥ 56px, tipografía grande, una acción principal por pantalla.
 
+## Modelos de negocio de la plataforma
+
+Eskemia tendrá dos modelos de negocio. Toda decisión técnica tiene que dejar posibles a los dos. Todavía no se implementan.
+
+1. **Servicios en la nube, datos en la base del cliente:** el cliente usa todos los servicios de Eskemia en la nube, pero almacena sus datos en sus propias bases de datos.
+2. **100% en la nube:** Eskemia aloja también los datos, y el cliente paga por el espacio.
+
+Antes de tomar una medida que impida escalar de esta forma, frenar y avisar. En particular:
+
+- **Un solo producto:** el mismo código y el mismo esquema para los dos modelos, sin versiones separadas por cliente.
+- **Migraciones portables:** todo el esquema va en migraciones versionadas que se puedan aplicar en cualquier base. Nada de cambios manuales ni de datos propios de Eskemia dentro de las migraciones de esquema.
+- **Base por cliente:** no asumir una única base para toda la plataforma ni consultas que crucen datos entre empresas. `tenant_id` sigue en todas las tablas.
+- **Datos completos:** archivos y fotos, usuarios y `eventos` también son datos del cliente, y tienen que poder vivir donde vivan sus tablas.
+- **Espacio medible:** tiene que poder saberse cuánto ocupa cada empresa, en base y en archivos, para poder cobrarlo.
+
+Limitaciones actuales a tener presentes, sin resolver todavía:
+
+- La app apunta a una sola base, fijada al compilar (`VITE_SUPABASE_URL`).
+- Login, archivos y tiempo real dependen de Supabase en la misma base que los datos.
+- Sin definir: qué tipo de base debe tener el cliente, y dónde vive el login en el primer modelo.
+
 ## Módulo de Compras
 
 En construcción. El plan es `docs/plan-compras.md` (manda ante dudas de diseño) y sus reglas están en `docs/claude-compras.md`. El comportamiento de la interfaz está en `docs/principios-ux.md`.
