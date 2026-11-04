@@ -9,13 +9,13 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icons/*.png'],
       manifest: {
-        name: 'Eskemia · Recepción',
+        name: 'Eskemia',
         short_name: 'Eskemia',
-        description: 'Recepción de mercadería',
+        description: 'Compras y recepción de mercadería',
         lang: 'es-AR',
         start_url: '/',
         scope: '/',
-        display: 'fullscreen',
+        display: 'standalone',
         background_color: '#f6f5f1',
         theme_color: '#0e5e5a',
         icons: [

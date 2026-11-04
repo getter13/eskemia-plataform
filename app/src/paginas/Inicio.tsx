@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, ChevronRight, ClipboardList, FileUp, LogOut, PackagePlus, ShieldCheck } from 'lucide-react';
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import { AlertTriangle, ChevronRight, ClipboardList, FileUp, LogOut, PackagePlus, ShieldCheck, ShoppingCart } from 'lucide-react';
 import { Encabezado } from '../componentes/Encabezado';
 import { Modal } from '../componentes/Modal';
 import { db, tienePermiso, type RecepcionLocal } from '../lib/db';
@@ -27,6 +27,8 @@ export function Inicio() {
       [],
     ) ?? [];
   const pendientes = useLiveQuery(() => db.cola.count(), []) ?? 0;
+  const [parametros] = useSearchParams();
+  const puedeComprar = tienePermiso(perfil, 'compras.catalogo.ver');
 
   async function abrir(r: RecepcionLocal) {
     if (r.estado === 'RECHAZADA') {
@@ -37,6 +39,12 @@ export function Inicio() {
     } else {
       navegar(`/recepcion/${r.id}/carga`);
     }
+  }
+
+  // Quien compra arranca en el marketplace; el kiosco sigue a un toque desde su perfil.
+  if (puedeComprar && !puedeOperar) return <Navigate to="/compras" replace />;
+  if (puedeComprar && !parametros.has('kiosco') && !tienePermiso(perfil, 'recepcion.recepcion.validar')) {
+    return <Navigate to="/compras" replace />;
   }
 
   return (
@@ -87,6 +95,11 @@ export function Inicio() {
         {tienePermiso(perfil, 'recepcion.recepcion.validar') && (
           <button className="btn" onClick={() => navegar('/admin')}>
             <ClipboardList size={20} /> Administración
+          </button>
+        )}
+        {puedeComprar && (
+          <button className="btn" onClick={() => navegar('/compras')}>
+            <ShoppingCart size={20} /> Compras
           </button>
         )}
         {tienePermiso(perfil, 'compras.catalogo.gestionar') && (

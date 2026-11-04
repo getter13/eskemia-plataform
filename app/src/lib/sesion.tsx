@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { db, guardarMeta, leerMeta, tienePermiso, type Perfil, type PermisoAsignado } from './db';
+import { useCarrito } from './carrito';
 import { asegurarDispositivo } from './operaciones';
 import { iniciarSincronizacion, pedirSincronizacion } from './sync';
 import { supabase } from './supabase';
@@ -105,4 +106,5 @@ export function ProveedorSesion({ children }: { children: ReactNode }) {
 export async function cerrarSesion() {
   await supabase.auth.signOut();
   await Promise.all(db.tables.map((t) => t.clear()));
+  useCarrito.getState().vaciar();
 }

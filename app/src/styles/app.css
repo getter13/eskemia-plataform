@@ -880,3 +880,313 @@ body,
   font-size: 14px;
   overflow-wrap: anywhere;
 }
+
+/* Marketplace móvil: 48 px táctiles, base 16 px, acciones en la zona del pulgar. */
+.solo-lector {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.mk-flex {
+  flex: 1;
+  min-width: 0;
+}
+.mk-pantalla {
+  height: 100dvh;
+}
+.mk-cabecera {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-100);
+}
+.mk-cabecera-titulo {
+  flex-direction: row;
+  align-items: center;
+  min-height: 64px;
+}
+.mk-titulo {
+  font-size: 24px;
+  line-height: 1.2;
+}
+.mk-buscador {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 48px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--ink-muted);
+  border-radius: var(--radius-md);
+  background: var(--surface-100);
+}
+.mk-buscador:focus-within {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+.mk-buscador input {
+  flex: 1;
+  min-width: 0;
+  min-height: 46px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font: 16px var(--font-sans);
+}
+.mk-chips {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.mk-chip {
+  flex: none;
+  min-height: 48px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-200);
+  color: var(--ink);
+  font: 14px var(--font-sans);
+}
+.mk-chip[aria-pressed='true'] {
+  border-color: var(--brand);
+  background: var(--brand-tint);
+  font-weight: 600;
+}
+.mk-aviso {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 14px;
+}
+.mk-lista {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-2) var(--space-4);
+}
+.grupo-pedido {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.mk-fila {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding-bottom: var(--space-2);
+}
+.mk-tarjeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-200);
+  cursor: pointer;
+}
+.mk-nombre {
+  font: 600 16px/1.3 var(--font-sans);
+  overflow-wrap: anywhere;
+}
+.mk-tarjeta .muted,
+.mk-oferta .muted,
+.mk-linea .muted {
+  font-size: 14px;
+}
+.mk-etiqueta {
+  align-self: flex-start;
+  min-height: 0;
+  font-size: 12px;
+}
+.mk-stepper {
+  flex: none;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--brand);
+  border-radius: var(--radius-md);
+  background: var(--surface-100);
+}
+.mk-paso {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--brand);
+  cursor: pointer;
+}
+.mk-agregar {
+  border: 1px solid var(--brand);
+  background: var(--surface-100);
+}
+.mk-volver {
+  color: var(--ink);
+}
+.mk-cantidad {
+  min-width: 28px;
+  text-align: center;
+}
+.mk-paso:focus-visible,
+.mk-chip:focus-visible,
+.mk-tarjeta:focus-visible,
+.mk-nav-item:focus-visible,
+.mk-barra-pedido:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+.mk-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-10) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-200);
+  text-align: center;
+}
+.mk-esqueleto {
+  height: 112px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-200);
+}
+.mk-barra-pedido {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 56px;
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  background: var(--brand);
+  color: var(--surface-100);
+  font: 14px var(--font-sans);
+  text-align: left;
+  cursor: pointer;
+}
+.mk-nav {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--line);
+  background: var(--surface-100);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.mk-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 56px;
+  color: var(--ink-muted);
+  font-size: 12px;
+  text-decoration: none;
+}
+.mk-nav-item.activo {
+  color: var(--brand);
+  font-weight: 600;
+}
+.mk-hoja-fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: rgb(21 24 29 / 45%);
+}
+.mk-hoja {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 11;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 640px;
+  max-height: 85dvh;
+  margin: 0 auto;
+  padding: var(--space-2) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--surface-100);
+  box-shadow: 0 -8px 24px rgb(21 24 29 / 20%);
+}
+.mk-hoja-agarre {
+  align-self: center;
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--line);
+}
+.mk-hoja-titulo {
+  font-size: 24px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.mk-hoja-lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  overflow-y: auto;
+}
+.mk-oferta,
+.mk-linea {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--line);
+}
+.mk-boton {
+  min-height: 48px;
+  font-size: 16px;
+}
+.mk-acceso {
+  justify-content: flex-start;
+  text-decoration: none;
+}
+.mk-orden {
+  padding: var(--space-4);
+}
+.mk-subtotal {
+  flex-wrap: nowrap;
+}
+.mk-progreso {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--line);
+}
+.mk-progreso span {
+  display: block;
+  height: 100%;
+  background: var(--brand);
+}
+.mk-pie {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-top: 1px solid var(--line);
+  background: var(--surface-100);
+}
+@media (min-width: 768px) {
+  .mk-cabecera,
+  .mk-lista,
+  .mk-pie {
+    width: 100%;
+    max-width: 720px;
+    margin-inline: auto;
+  }
+}

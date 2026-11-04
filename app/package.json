@@ -13,6 +13,7 @@
     "@fontsource/ibm-plex-sans": "^5.3.0",
     "@fontsource/space-grotesk": "^5.3.0",
     "@supabase/supabase-js": "^2.118.0",
+    "@tanstack/react-virtual": "^3.14.26",
     "@zxing/browser": "^0.2.1",
     "@zxing/library": "^0.23.0",
     "dexie": "^4.4.7",
@@ -22,7 +23,9 @@
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-router-dom": "^7.18.5",
-    "zod": "^4.6.7"
+    "vaul": "^1.1.2",
+    "zod": "^4.6.7",
+    "zustand": "^5.0.16"
   },
   "devDependencies": {
     "@types/papaparse": "^5.5.2",

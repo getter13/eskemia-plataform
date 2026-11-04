@@ -37,3 +37,6 @@ desktop.ini
 
 # Instaladores de plugins: el contenido ya está en .claude/skills/
 docs/*.zip
+
+# Salida local de Playwright
+.playwright-mcp/

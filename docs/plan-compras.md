@@ -166,7 +166,7 @@ producto_proveedor producto + proveedor + presentación de compra por defecto + 
 El marketplace se diseña para **pedir desde el celular, en cualquier momento y lugar**, con la experiencia de Mercado Libre / PedidosYa. El escritorio queda para catálogo, configuración, tablero y reportes. Rige `docs/principios-ux.md`.
 
 **Inicio (móvil)**
-- Buscador fijo arriba (búsqueda tolerante a errores de tipeo con `pg_trgm`).
+- Buscador fijo arriba, tolerante a errores de tipeo. Busca en el dispositivo sobre el catálogo guardado, para funcionar sin señal.
 - Chips de rubros desplazables.
 - Secciones: "Repetir último pedido" (un toque → carrito precargado), "Lo que más pedís", "Tus plantillas", favoritos.
 - Barra inferior de navegación: Inicio · Buscar · Pedidos · Perfil.
@@ -242,10 +242,10 @@ configuracion_empresa (permitir_autoaprobacion, ...)
 -- Catálogo
 rubros                (id, nombre, orden, activo)                 -- ej.: Comida, Limpieza, Descartables
 categorias            -- existente: + rubro_id, activo            -- ej.: Proteínas, Lácteos (rubro Comida)
-productos             -- existente: + unidad_stock, activo; el rubro se deriva de categoria_id
+productos             -- existente: + sku, unidad_stock, activo; el rubro se deriva de categoria_id
 presentaciones        (id, producto_id, nombre, factor, activa)
 producto_codigos      (id, producto_id, presentacion_id, codigo, tipo)  UNIQUE(tenant_id, codigo)
-proveedores           -- existente: + contacto, telefono_whatsapp, email, canal_envio,
+proveedores           -- existente: + codigo (ID del proveedor), contacto, telefono_whatsapp, email, canal_envio,
                       --   plazo_entrega_dias, dias_pedido[], monto_minimo
 producto_proveedor    (producto_id, proveedor_id, presentacion_id, codigo_proveedor,
                        precio_actual, preferido, activo)
