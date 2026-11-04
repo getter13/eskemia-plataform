@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, ChevronRight, ClipboardList, FileUp, LogOut, PackagePlus } from 'lucide-react';
+import { AlertTriangle, ChevronRight, ClipboardList, FileUp, LogOut, PackagePlus, ShieldCheck } from 'lucide-react';
 import { Encabezado } from '../componentes/Encabezado';
 import { Modal } from '../componentes/Modal';
 import { db, tienePermiso, type RecepcionLocal } from '../lib/db';
@@ -92,6 +92,11 @@ export function Inicio() {
         {tienePermiso(perfil, 'compras.catalogo.gestionar') && (
           <button className="btn" onClick={() => navegar('/admin/importar')}>
             <FileUp size={20} /> Importar catálogo
+          </button>
+        )}
+        {tienePermiso(perfil, 'compras.aprobacion.configurar') && (
+          <button className="btn" onClick={() => navegar('/compras/reglas')}>
+            <ShieldCheck size={20} /> Reglas de aprobación
           </button>
         )}
         <span className="espacio" />

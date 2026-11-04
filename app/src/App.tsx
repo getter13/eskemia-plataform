@@ -8,6 +8,7 @@ import { Importar } from './paginas/admin/Importar';
 import { Roles } from './paginas/admin/Roles';
 import { Carga } from './paginas/Carga';
 import { Cierre } from './paginas/Cierre';
+import { Reglas } from './paginas/compras/Reglas';
 import { Inicio } from './paginas/Inicio';
 import { Login } from './paginas/Login';
 import { NuevaRecepcion } from './paginas/NuevaRecepcion';
@@ -52,6 +53,10 @@ function Rutas() {
       <Route path="/recepcion/:id/cierre" element={<Requiere permiso={OPERAR}><Cierre /></Requiere>} />
       <Route path="/admin" element={<Requiere permiso={VALIDAR}><Bandeja /></Requiere>} />
       <Route path="/admin/recepcion/:id" element={<Requiere permiso={VALIDAR}><Detalle /></Requiere>} />
+      <Route
+        path="/compras/reglas"
+        element={<Requiere permiso="compras.aprobacion.configurar"><Reglas /></Requiere>}
+      />
       <Route
         path="/admin/importar"
         element={<Requiere permiso="compras.catalogo.gestionar"><Importar /></Requiere>}

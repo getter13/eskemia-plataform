@@ -14,7 +14,7 @@ El plan completo está en `docs/plan-compras.md`. Ante dudas de diseño, ese doc
 
 1. Permisos parametrizables por código (roles configurables por empresa, niveles de aprobación, sectores).
 2. Catálogo: rubros, productos, presentaciones, **múltiples códigos de barra por producto** (cada código asociado a una presentación y su factor), proveedores, relación producto ↔ proveedor con precio. Importación CSV.
-3. Reglas de aprobación con prioridad **producto > rubro > empresa** (modos `NUNCA | SIEMPRE | POR_MONTO`, `nivel_requerido`) + límite por rol (`limite_monto_sin_aprobacion`).
+3. Reglas de aprobación con prioridad **producto > categoría > rubro > empresa** (modos `NUNCA | SIEMPRE | POR_MONTO`, `nivel_requerido`) + límite por rol (`limite_monto_sin_aprobacion`).
 4. Marketplace con carrito agrupado por proveedor y selector de presentación.
 5. `confirmar_pedido`: split por proveedor → una OC por proveedor → `evaluar_aprobacion` por OC.
 6. Bandeja de aprobación por nivel.

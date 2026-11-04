@@ -24,7 +24,7 @@ Primer eslabón de la cadena **Compras → Recepción → Administración**.
 | Misma base Supabase y misma app que Recepción (ruta `/compras`) | La conexión entre módulos es una clave foránea, no una integración. Un login, un despliegue. |
 | **Permisos por código, no por rol fijo** | Los roles se configuran por empresa. El código consulta permisos (`compras.oc.aprobar`), nunca nombres de rol. Agregar un cargo nuevo no requiere programar. |
 | **Aprobación evaluada por OC, después del split** | Si solo un proveedor tiene ítems que requieren aprobación, las demás OC salen inmediatamente. |
-| **Reglas de aprobación con prioridad producto > rubro > empresa** | Permite "carnes siempre se aprueban, salvo este corte" o "limpieza nunca". |
+| **Reglas de aprobación con prioridad producto > categoría > rubro > empresa** | Permite "proteínas siempre se aprueban, salvo este corte" o "limpieza nunca". |
 | **Código de barra → presentación → factor** | Cada producto admite N códigos; el escaneo determina la presentación y la cantidad por defecto. |
 | Transiciones de estado solo por funciones RPC | Igual que Recepción. El front nunca cambia estados directamente. |
 | Mismo log `eventos` (append-only, hash encadenado) | Trazabilidad única: pedido → OC → aprobación → recepción. |
@@ -114,14 +114,14 @@ Tabla `reglas_aprobacion`:
 
 | Campo | Valores |
 |---|---|
-| `alcance` | `EMPRESA` · `RUBRO` · `PRODUCTO` (Fase 3: `PROVEEDOR`) |
-| `alcance_id` | id del rubro o producto (null en EMPRESA) |
+| `alcance` | `EMPRESA` · `RUBRO` · `CATEGORIA` · `PRODUCTO` (Fase 3: `PROVEEDOR`) |
+| `alcance_id` | id del rubro, categoría o producto (null en EMPRESA) |
 | `modo` | `NUNCA` · `SIEMPRE` · `POR_MONTO` |
-| `monto_umbral` | para `POR_MONTO`: subtotal del rubro/producto dentro de la OC |
+| `monto_umbral` | para `POR_MONTO`: subtotal, dentro de la OC, de los ítems que resolvieron a esa regla |
 | `nivel_requerido` | nivel mínimo del aprobador |
 | `activa` | bool |
 
-**Resolución por ítem:** regla de PRODUCTO si existe → si no, regla del RUBRO → si no, regla de EMPRESA (por defecto `NUNCA`).
+**Resolución por ítem:** regla de PRODUCTO si existe → si no, de su CATEGORÍA → si no, del RUBRO de esa categoría → si no, de EMPRESA (por defecto `NUNCA`).
 
 ### 4.2 Evaluación (`evaluar_aprobacion(oc_id)`)
 
