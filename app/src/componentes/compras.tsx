@@ -1,11 +1,14 @@
 // Piezas compartidas del marketplace móvil.
 import { NavLink } from 'react-router-dom';
-import { Home, Minus, Plus, ReceiptText, Search, ShieldAlert, ShoppingCart, User } from 'lucide-react';
+import { CheckCheck, Home, Minus, Plus, ReceiptText, Search, ShieldAlert, ShoppingCart, User } from 'lucide-react';
 import { Drawer } from 'vaul';
 import { useCarrito, vibrar } from '../lib/carrito';
 import { formatoMoneda, type ProductoCatalogo } from '../lib/catalogo';
+import { tienePermiso } from '../lib/db';
+import { useSesion } from '../lib/sesion';
 
 export function NavCompras() {
+  const { perfil } = useSesion();
   const claseDe = ({ isActive }: { isActive: boolean }) => `mk-nav-item${isActive ? ' activo' : ''}`;
   return (
     <nav className="mk-nav" aria-label="Compras">
@@ -18,6 +21,11 @@ export function NavCompras() {
       <NavLink className={claseDe} to="/compras/pedidos">
         <ReceiptText size={24} /> Pedidos
       </NavLink>
+      {tienePermiso(perfil, 'compras.oc.aprobar') && (
+        <NavLink className={claseDe} to="/compras/aprobaciones">
+          <CheckCheck size={24} /> Aprobar
+        </NavLink>
+      )}
       <NavLink className={claseDe} to="/compras/perfil">
         <User size={24} /> Perfil
       </NavLink>

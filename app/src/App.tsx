@@ -18,6 +18,7 @@ const Reglas = lazy(() => import('./paginas/compras/Reglas').then((m) => ({ defa
 const Marketplace = lazy(() => import('./paginas/compras/Marketplace').then((m) => ({ default: m.Marketplace })));
 const Pedido = lazy(() => import('./paginas/compras/Pedido').then((m) => ({ default: m.Pedido })));
 const Pedidos = lazy(() => import('./paginas/compras/Secciones').then((m) => ({ default: m.Pedidos })));
+const Aprobaciones = lazy(() => import('./paginas/compras/Aprobaciones').then((m) => ({ default: m.Aprobaciones })));
 const Orden = lazy(() => import('./paginas/compras/Orden').then((m) => ({ default: m.Orden })));
 const PerfilCompras = lazy(() => import('./paginas/compras/Secciones').then((m) => ({ default: m.PerfilCompras })));
 
@@ -65,6 +66,7 @@ function Rutas() {
       <Route path="/compras" element={<Requiere permiso={CATALOGO}><Marketplace /></Requiere>} />
       <Route path="/compras/pedido" element={<Requiere permiso={CATALOGO}><Pedido /></Requiere>} />
       <Route path="/compras/pedidos" element={<Requiere permiso={CATALOGO}><Pedidos /></Requiere>} />
+      <Route path="/compras/aprobaciones" element={<Requiere permiso="compras.oc.aprobar"><Aprobaciones /></Requiere>} />
       <Route path="/compras/oc/:id" element={<Requiere permiso={CATALOGO}><Orden /></Requiere>} />
       <Route path="/compras/perfil" element={<Requiere permiso={CATALOGO}><PerfilCompras /></Requiere>} />
       <Route
