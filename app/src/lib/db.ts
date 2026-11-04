@@ -1,6 +1,5 @@
 import Dexie, { type Table } from 'dexie';
 
-export type Rol = 'operario' | 'supervisor' | 'admin';
 export type TipoMedida = 'UNIDAD' | 'PESO';
 export type Estado =
   | 'ABIERTA'
@@ -14,13 +13,25 @@ export type TipoLectura = 'ESCANEO' | 'MANUAL' | 'PESAJE';
 export type TipoAdjunto = 'REMITO' | 'RECHAZO' | 'MANUAL' | 'FIRMA_RECEPTOR' | 'FIRMA_TRANSPORTISTA';
 export type TipoDiferencia = 'FALTANTE' | 'SOBRANTE' | 'RECHAZO';
 
+/** sede_id nulo: el permiso vale en todas las sedes. */
+export interface PermisoAsignado {
+  permiso: string;
+  sede_id: string | null;
+}
+
 export interface Perfil {
   user_id: string;
   tenant_id: string;
   sede_id: string;
-  rol: Rol;
+  permisos: PermisoAsignado[];
   nombre: string;
 }
+
+/** Solo decide qué mostrar: quien autoriza es el servidor. */
+export const tienePermiso = (perfil: Perfil | null, codigo: string) =>
+  !!perfil?.permisos.some(
+    (p) => p.permiso === codigo && (p.sede_id === null || p.sede_id === perfil.sede_id),
+  );
 
 export interface Categoria {
   id: string;

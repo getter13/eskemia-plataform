@@ -17,6 +17,7 @@ const USUARIOS = [
     id: '00000000-0000-4000-c000-000000000001',
     email: 'operario@eskemia.test',
     rol: 'operario',
+    nombreRol: 'Operario de recepción',
     nombre: 'Operario de prueba',
     sede: SEDE,
     variable: 'SEED_OPERARIO_PASSWORD',
@@ -25,6 +26,7 @@ const USUARIOS = [
     id: '00000000-0000-4000-c000-000000000002',
     email: 'admin@eskemia.test',
     rol: 'admin',
+    nombreRol: 'Admin',
     nombre: 'Admin de prueba',
     sede: null,
     variable: 'SEED_ADMIN_PASSWORD',
@@ -65,6 +67,12 @@ on conflict (provider_id, provider) do nothing;
 insert into public.perfiles (user_id, tenant_id, sede_id, rol, nombre)
 values ('${u.id}', '${TENANT}', ${u.sede ? `'${u.sede}'` : 'null'}, '${u.rol}', '${u.nombre}')
 on conflict (user_id) do nothing;
+
+insert into public.usuario_roles (tenant_id, user_id, rol_id, sede_id)
+select '${TENANT}', '${u.id}', r.id, ${u.sede ? `'${u.sede}'` : 'null'}
+from public.roles r
+where r.tenant_id = '${TENANT}' and r.nombre = '${u.nombreRol}'
+on conflict do nothing;
 `;
 }).join('\n');
 

@@ -29,7 +29,7 @@ Hardware: **tablet + escáner 2D** en modo teclado (HID, sufijo Enter). Sin bala
 5. Cierre: firma en pantalla (canvas) del receptor y del transportista → estado `CERRADA_OK` o `CERRADA_CON_DIFERENCIAS`.
 6. Offline-first: toda lectura se guarda primero en IndexedDB y se sincroniza con cola cuando hay conexión. Indicador de estado de sincronización siempre visible.
 
-### Back (ruta `/admin`, misma app, acceso por rol)
+### Back (ruta `/admin`, misma app, acceso por permiso)
 - Bandeja diaria de recepciones con semáforo: OK / con diferencias / control incompleto.
 - Detalle: ítems, lecturas crudas, fotos, firmas, línea de tiempo de eventos.
 - Validar / Rechazar (con observación). La validación queda **bloqueada** si falta: foto de remito, ítems, motivos de diferencias, firmas.
@@ -54,7 +54,8 @@ Las transiciones se hacen **solo** mediante funciones RPC de Postgres que valida
 ## Modelo de datos (todas las tablas con `tenant_id` y `sede_id`)
 
 ```
-tenants, sedes, perfiles (user_id, rol: operario|supervisor|admin, sede_id), dispositivos
+tenants, sedes, perfiles (user_id, sede_id), dispositivos
+permisos, roles, rol_permisos, sectores, usuario_roles, configuracion_empresa  -- ver docs/plan-compras.md §3
 categorias (nombre, orden)
 proveedores, productos (gtin, nombre, categoria_id, tipo_medida: UNIDAD|PESO, requiere_lote, requiere_vencimiento, pendiente_validacion)
 ordenes_compra, oc_items                 -- vacías en el MVP, las alimentará el módulo Compras
@@ -95,6 +96,24 @@ eventos (append-only: entidad, entidad_id, accion, payload jsonb, usuario_id, di
 - Íconos Lucide, trazo 1.5px. Sin logo: nombre "Eskemia" en Space Grotesk 600.
 - Contraste de texto ≥ 4.5:1. Estados nunca solo por color.
 - Kiosco: objetivos táctiles ≥ 56px, tipografía grande, una acción principal por pantalla.
+
+## Módulo de Compras
+
+En construcción. El plan es `docs/plan-compras.md` (manda ante dudas de diseño) y sus reglas están en `docs/claude-compras.md`. El comportamiento de la interfaz está en `docs/principios-ux.md`.
+
+- El código consulta permisos (`tiene_permiso`), nunca nombres de rol.
+- `perfiles.rol` ya no se usa, pero se borra recién con todas las tablets actualizadas: las versiones instaladas todavía la leen.
+- Tests SQL en `supabase/tests/`: terminan en `ROLLBACK` y se corren con `npx supabase db query --remote --yes -f <archivo>`.
+- Los privilegios por defecto de `public` dan todo a `anon`: cada tabla nueva lleva `revoke` y RLS.
+
+## UI/UX skills
+
+Taste, a11y, bans, voice, and icon library for this project live in `.ux-profile.md`.
+Run `setup-ui-ux-skills` again only to change those defaults.
+Before UI or microcopy work, read `.ux-profile.md`, then the matching domain skill (page-patterns, viewports, forms, surfaces, loaders, empty-states, copy, motion).
+Before creating a new page, read `page-patterns` and name the pattern. Do not write page markup until the pattern is named.
+Layouts must pass `viewports` at 375px and 1280px.
+Before finishing UI, run `ux-audit`.
 
 ## Reglas de trabajo
 

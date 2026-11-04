@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
-import { db, guardarMeta, leerMeta, type Perfil } from './db';
+import { db, guardarMeta, leerMeta, tienePermiso, type Perfil, type PermisoAsignado } from './db';
 import { asegurarDispositivo } from './operaciones';
 import { iniciarSincronizacion, pedirSincronizacion } from './sync';
 import { supabase } from './supabase';
@@ -23,14 +23,21 @@ export const useSesion = () => useContext(Contexto);
 
 async function resolverPerfil(userId: string): Promise<Perfil | null> {
   const clave = `perfil:${userId}`;
-  const { data, error } = await supabase
-    .from('perfiles')
-    .select('user_id,tenant_id,sede_id,rol,nombre')
-    .eq('user_id', userId)
-    .maybeSingle();
+  const [{ data, error }, { data: permisos, error: errorPermisos }] = await Promise.all([
+    supabase.from('perfiles').select('user_id,tenant_id,sede_id,nombre').eq('user_id', userId).maybeSingle(),
+    supabase.rpc('mis_permisos'),
+  ]);
 
   // Sin conexión se trabaja con el último perfil conocido.
-  if (error || !data) return (await leerMeta<Perfil>(clave)) ?? null;
+  if (error || errorPermisos || !data) {
+    const guardado = await leerMeta<Perfil>(clave);
+    if (!guardado) return null;
+    // Un perfil guardado por la versión anterior no trae permisos: el kiosco tiene que seguir operando.
+    return {
+      ...guardado,
+      permisos: guardado.permisos ?? [{ permiso: 'recepcion.recepcion.operar', sede_id: null }],
+    };
+  }
 
   let sedeId = data.sede_id as string | null;
   if (!sedeId) {
@@ -40,7 +47,7 @@ async function resolverPerfil(userId: string): Promise<Perfil | null> {
   }
   if (!sedeId) return null;
 
-  const perfil: Perfil = { ...data, sede_id: sedeId };
+  const perfil: Perfil = { ...data, sede_id: sedeId, permisos: (permisos ?? []) as PermisoAsignado[] };
   await guardarMeta(clave, perfil);
   return perfil;
 }
@@ -69,7 +76,7 @@ export function ProveedorSesion({ children }: { children: ReactNode }) {
         perfil,
         errorPerfil: perfil ? null : 'Este usuario no tiene un perfil activo.',
       });
-      if (perfil) {
+      if (perfil && tienePermiso(perfil, 'recepcion.recepcion.operar')) {
         await asegurarDispositivo(perfil);
         pedirSincronizacion();
       }

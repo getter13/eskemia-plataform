@@ -852,3 +852,23 @@ body,
     max-width: 1040px;
   }
 }
+
+/* Usuarios y roles */
+.espacio-flex {
+  flex: 1;
+  min-width: 200px;
+}
+.fila-permiso {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 56px;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--line);
+}
+.fila-permiso input {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  accent-color: var(--brand);
+}

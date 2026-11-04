@@ -7,16 +7,20 @@ import {
   Download,
   RefreshCw,
   ScanLine,
+  Users,
 } from 'lucide-react';
 import { Encabezado } from '../../componentes/Encabezado';
 import { EtiquetaSemaforo } from '../../componentes/EtiquetaSemaforo';
 import { descargarCsv, fechaHoy, moverFecha, traerBandeja, type FilaBandeja } from '../../lib/admin';
+import { tienePermiso } from '../../lib/db';
 import { ETIQUETA_ESTADO, formatoFecha, formatoFechaHora } from '../../lib/formato';
+import { useSesion } from '../../lib/sesion';
 
 const INTERVALO_MS = 30_000;
 
 export function Bandeja() {
   const navegar = useNavigate();
+  const { perfil } = useSesion();
   const [parametros, setParametros] = useSearchParams();
   const fecha = parametros.get('fecha') ?? fechaHoy();
   const [filas, setFilas] = useState<FilaBandeja[] | null>(null);
@@ -136,6 +140,11 @@ export function Bandeja() {
         <button className="btn" onClick={() => navegar('/')}>
           <ScanLine size={24} /> Ir al kiosco
         </button>
+        {tienePermiso(perfil, 'admin.usuarios.gestionar') && (
+          <button className="btn" onClick={() => navegar('/admin/roles')}>
+            <Users size={24} /> Usuarios y roles
+          </button>
+        )}
         <span className="espacio" />
         <button
           className="btn btn-primario"

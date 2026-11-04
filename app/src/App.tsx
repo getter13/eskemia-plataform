@@ -1,13 +1,24 @@
+import type { ReactNode } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
+import { tienePermiso } from './lib/db';
 import { ProveedorSesion, cerrarSesion, useSesion } from './lib/sesion';
 import { Bandeja } from './paginas/admin/Bandeja';
 import { Detalle } from './paginas/admin/Detalle';
+import { Roles } from './paginas/admin/Roles';
 import { Carga } from './paginas/Carga';
 import { Cierre } from './paginas/Cierre';
 import { Inicio } from './paginas/Inicio';
 import { Login } from './paginas/Login';
 import { NuevaRecepcion } from './paginas/NuevaRecepcion';
 import { Resumen } from './paginas/Resumen';
+
+function Requiere({ permiso, children }: { permiso: string; children: ReactNode }) {
+  const { perfil } = useSesion();
+  return tienePermiso(perfil, permiso) ? children : <Navigate to="/" replace />;
+}
+
+const OPERAR = 'recepcion.recepcion.operar';
+const VALIDAR = 'recepcion.recepcion.validar';
 
 function Rutas() {
   const { cargando, session, perfil, errorPerfil } = useSesion();
@@ -34,17 +45,15 @@ function Rutas() {
   return (
     <Routes>
       <Route path="/" element={<Inicio />} />
-      <Route path="/recepcion/nueva" element={<NuevaRecepcion />} />
-      <Route path="/recepcion/:id/carga" element={<Carga />} />
-      <Route path="/recepcion/:id/resumen" element={<Resumen />} />
-      <Route path="/recepcion/:id/cierre" element={<Cierre />} />
+      <Route path="/recepcion/nueva" element={<Requiere permiso={OPERAR}><NuevaRecepcion /></Requiere>} />
+      <Route path="/recepcion/:id/carga" element={<Requiere permiso={OPERAR}><Carga /></Requiere>} />
+      <Route path="/recepcion/:id/resumen" element={<Requiere permiso={OPERAR}><Resumen /></Requiere>} />
+      <Route path="/recepcion/:id/cierre" element={<Requiere permiso={OPERAR}><Cierre /></Requiere>} />
+      <Route path="/admin" element={<Requiere permiso={VALIDAR}><Bandeja /></Requiere>} />
+      <Route path="/admin/recepcion/:id" element={<Requiere permiso={VALIDAR}><Detalle /></Requiere>} />
       <Route
-        path="/admin"
-        element={perfil.rol === 'operario' ? <Navigate to="/" replace /> : <Bandeja />}
-      />
-      <Route
-        path="/admin/recepcion/:id"
-        element={perfil.rol === 'operario' ? <Navigate to="/" replace /> : <Detalle />}
+        path="/admin/roles"
+        element={<Requiere permiso="admin.usuarios.gestionar"><Roles /></Requiere>}
       />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

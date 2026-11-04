@@ -34,3 +34,6 @@ desktop.ini
 
 # Claude Code: configuracion local
 .claude/settings.local.json
+
+# Instaladores de plugins: el contenido ya está en .claude/skills/
+docs/*.zip
