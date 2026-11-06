@@ -1,0 +1,14 @@
+{
+  "name": "eskemia",
+  "private": true,
+  "description": "Monorepo de Eskemia: apps/ (web, api), paquetes/ (cliente-api, contratos, tokens), db/ e infra/.",
+  "packageManager": "pnpm@12.18.0",
+  "engines": {
+    "node": ">=26"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm --filter @eskemia/web dev",
+    "typecheck": "pnpm -r typecheck"
+  }
+}

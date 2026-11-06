@@ -1,0 +1,4 @@
+# Eskemia · Workspaces de pnpm: aplicaciones (apps/) y paquetes compartidos (paquetes/).
+packages:
+  - apps/*
+  - paquetes/*

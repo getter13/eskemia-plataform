@@ -1,12 +1,12 @@
-# Eskemia · CI mínimo (Etapa 0)
+# Eskemia · CI mínimo
 #
 # Qué hace, en cada push y pull request:
-#   1. web:     tsc (chequeo de tipos) y build de la app.
+#   1. web:     tsc (chequeo de tipos) y build de todo el workspace pnpm.
 #   2. compose: valida que infra/compose/docker-compose.yml + overlay de
 #               desarrollo resuelvan con .env.example (sin levantar nada).
 #   3. secretos: gitleaks sobre TODO el historial de git.
-# Dónde encaja: plan de ejecución, Etapa 0. En la Etapa 1 (monorepo pnpm) el
-# job web pasa a `pnpm -r` y la ruta app/ a apps/web.
+# Dónde encaja: plan de ejecución, Etapas 0 y 1 (monorepo pnpm; la versión de
+# pnpm sale del campo packageManager del package.json raíz).
 # Actions fijadas por SHA de commit; gitleaks por versión y checksum.
 
 name: CI
@@ -27,21 +27,18 @@ jobs:
   web:
     name: tsc y build
     runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: app
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 26
-          cache: npm
-          cache-dependency-path: app/package-lock.json
-      - run: npm ci --no-audit --no-fund
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - name: tsc
-        run: npx tsc --noEmit
+        run: pnpm -r typecheck
       - name: build
-        run: npm run build
+        run: pnpm -r build
 
   compose:
     name: compose válido

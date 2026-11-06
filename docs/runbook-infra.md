@@ -219,13 +219,13 @@ El mismo compose que producción. Eso es lo que da la paridad.
    contrapartida de que ahí sí `docker compose down -v` borra los datos.
 2. Instalar WSL2 con Ubuntu 24.04 y Docker Desktop con backend WSL2. Asignarle a WSL2 un
    límite de memoria razonable en `.wslconfig` (6 GB).
-3. Clonar el repo de Eskemia dentro de WSL2 y `npm install` en `app/`.
+3. Clonar el repo de Eskemia dentro de WSL2 y `pnpm install` en la raíz (monorepo pnpm).
 4. Copiar el mismo `docker-compose.yml` recortado y la misma release fijada que producción.
    Partir de `.env.example` con **secretos distintos** a los de producción.
 5. `docker compose up -d`. Aplicar las 19 migraciones **y** los seeds demo
    (`seed-compras-demo.sql`, `seed-ordenes-demo.sql`).
-6. `app/.env.local` apuntando a `http://localhost:8000` con la clave pública local.
-   `npm run dev`.
+6. `apps/web/.env.local` apuntando a `http://localhost:8000` con la clave pública local.
+   `pnpm dev`.
 7. Crear usuarios de prueba con distintos roles y verificar login, foto a Storage, lectura
    por escáner y una OC que aparezca en tiempo real en Pendientes.
 8. Correr el guion de prueba completo.

@@ -1,0 +1,6 @@
+{
+  "name": "@eskemia/cliente-api",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Única puerta a Supabase: el único paquete que importa @supabase/supabase-js."
+}
