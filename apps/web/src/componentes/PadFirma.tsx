@@ -1,3 +1,4 @@
+// Eskemia · Pad de firma del kiosco (receptor y transportista).
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Eraser } from 'lucide-react';
 
@@ -5,7 +6,8 @@ export interface PadFirmaRef {
   obtenerImagen: () => Promise<Blob | null>;
 }
 
-const TINTA = '#15181d';
+/** Color del trazo: el token --ink (el lienzo no lee variables CSS por sí solo). */
+const tinta = () => getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || 'black';
 // Evita aceptar como firma un toque accidental.
 const TRAZOS_MINIMOS = 12;
 
@@ -38,7 +40,7 @@ export const PadFirma = forwardRef<
       ctx.lineWidth = 2.5;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      ctx.strokeStyle = TINTA;
+      ctx.strokeStyle = tinta();
     };
     ajustar();
     const observador = new ResizeObserver(ajustar);

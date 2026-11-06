@@ -116,7 +116,7 @@ export function NuevaRecepcion() {
         {ocFija && oc && (
           <section className="tarjeta grupo" data-testid="oc-elegida">
             <strong>{oc.proveedor}</strong>
-            <span className="mono muted">{oc.numero}</span>
+            <span className="datos muted">{oc.numero}</span>
           </section>
         )}
 
@@ -151,7 +151,7 @@ export function NuevaRecepcion() {
               >
                 <span className="grupo">
                   <strong>{p.nombre}</strong>
-                  <span className="mono muted">{formatoCuit(p.cuit)}</span>
+                  <span className="datos muted">{formatoCuit(p.cuit)}</span>
                 </span>
               </button>
             ))}
@@ -172,7 +172,7 @@ export function NuevaRecepcion() {
                   key={o.id}
                   onClick={() => setOc(o)}
                 >
-                  <strong className="mono">{o.numero}</strong>
+                  <strong className="datos">{o.numero}</strong>
                 </button>
               ))}
               <button

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AlertTriangle, Check, ShieldAlert, Undo2, X } from 'lucide-react';
 import { Drawer } from 'vaul';
 import { NavCompras } from '../../componentes/compras';
-import { formatoMoneda } from '../../lib/catalogo';
+import { formatearMonto } from '../../lib/catalogo';
 import { formatoFechaHora, formatoNumero } from '../../lib/formato';
 import { alCambiarOrdenes } from '@eskemia/cliente-api';
 import { aprobarOc, motivoAprobacion, rechazarOc, traerBandeja, type OrdenBandeja } from '../../lib/aprobaciones';
@@ -114,7 +114,7 @@ export function Aprobaciones() {
         {ordenes?.map((o) => (
           <section className="tarjeta grupo mk-orden" data-testid="orden-aprobar" key={o.id}>
             <h2 className="mk-nombre">{o.proveedor}</h2>
-            <span className="mono muted">{o.numero}</span>
+            <span className="datos muted">{o.numero}</span>
             <span className="muted">
               {o.emisor} · {o.sede} · {formatoFechaHora(o.creado_en)}
             </span>
@@ -130,12 +130,12 @@ export function Aprobaciones() {
                   </span>
                   {i.disparo_aprobacion && <span className="etiqueta mk-etiqueta">Dispara la aprobación</span>}
                 </span>
-                <span className="mono">{formatoMoneda(i.subtotal)}</span>
+                <span className="datos">{formatearMonto(i.subtotal)}</span>
               </div>
             ))}
             <div className="fila mk-subtotal">
               <span className="mk-flex">Total estimado</span>
-              <strong className="mono">{formatoMoneda(o.total_estimado)}</strong>
+              <strong className="datos">{formatearMonto(o.total_estimado)}</strong>
             </div>
             <div className="mk-decision">
               <button className="btn mk-boton" onClick={() => setARechazar(o)}>

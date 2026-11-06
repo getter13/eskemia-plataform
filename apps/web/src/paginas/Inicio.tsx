@@ -85,7 +85,7 @@ export function Inicio() {
                   <span className="grupo" style={{ flex: 1 }}>
                     <span className="grilla-nombre">{o.proveedor}</span>
                     <span className="muted">
-                      <span className="mono">{o.numero}</span> · {o.items.filter((i) => i.saldo > 0).length} productos
+                      <span className="datos">{o.numero}</span> · {o.items.filter((i) => i.saldo > 0).length} productos
                       {o.fecha_entrega_estimada && ` · Entrega ${formatoFecha(o.fecha_entrega_estimada)}`}
                     </span>
                     <span className="fila">
@@ -115,8 +115,8 @@ export function Inicio() {
                   <span className="grupo" style={{ flex: 1 }}>
                     <span className="grilla-nombre">{r.proveedor_nombre}</span>
                     <span className="muted">
-                      {r.oc_numero && <span className="mono">{r.oc_numero} · </span>}
-                      Remito o factura <span className="mono">{r.nro_remito}</span> ·{' '}
+                      {r.oc_numero && <span className="datos">{r.oc_numero} · </span>}
+                      Remito o factura <span className="datos">{r.nro_remito}</span> ·{' '}
                       {formatoFechaHora(r.abierta_en)}
                     </span>
                     {r.estado === 'RECHAZADA' && r.observacion && (

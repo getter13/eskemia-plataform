@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AlertTriangle, ChevronLeft, ChevronRight, CloudOff, Search } from 'lucide-react';
-import { formatoMoneda, normalizar } from '../../lib/catalogo';
+import { formatearMonto, normalizar } from '../../lib/catalogo';
 import { formatoFecha, formatoFechaHora } from '../../lib/formato';
 import { ETIQUETA_ESTADO_OC, estaAtrasada, useOrdenes, type EstadoOc, type OrdenResumen } from '../../lib/ordenes';
 
@@ -82,7 +82,7 @@ export function Tablero() {
           <Link className="mk-tarjeta mk-enlace" data-testid="orden-tablero" key={o.id} to={`/compras/oc/${o.id}`}>
             <span className="grupo mk-flex">
               <strong>{o.proveedores?.nombre}</strong>
-              <span className="mono muted">{o.numero}</span>
+              <span className="datos muted">{o.numero}</span>
               <span className="muted">
                 {formatoFechaHora(o.creado_en)}
                 {o.fecha_entrega_estimada && ` · Entrega ${formatoFecha(o.fecha_entrega_estimada)}`}
@@ -96,7 +96,7 @@ export function Tablero() {
                 )}
               </span>
             </span>
-            <span className="mono">{formatoMoneda(o.total_estimado)}</span>
+            <span className="datos">{formatearMonto(o.total_estimado)}</span>
             <ChevronRight size={20} />
           </Link>
         ))}

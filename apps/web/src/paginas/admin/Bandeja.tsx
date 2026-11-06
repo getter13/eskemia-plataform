@@ -113,8 +113,8 @@ export function Bandeja() {
                   <span className="grupo fila-bandeja-datos">
                     <span className="grilla-nombre">{f.proveedor}</span>
                     <span className="muted">
-                      <span className="mono">{f.oc_numero ?? 'Sin OC'}</span> · Remito o factura{' '}
-                      <span className="mono">{f.nro_remito}</span> · {f.sede} ·{' '}
+                      <span className="datos">{f.oc_numero ?? 'Sin OC'}</span> · Remito o factura{' '}
+                      <span className="datos">{f.nro_remito}</span> · {f.sede} ·{' '}
                       {formatoFechaHora(f.abierta_en)}
                     </span>
                     {f.remito_duplicado && (
@@ -126,7 +126,7 @@ export function Bandeja() {
                   <span className="fila-bandeja-estado">
                     <EtiquetaSemaforo semaforo={f.semaforo} />
                     <span className="etiqueta etiqueta-neutra">{ETIQUETA_ESTADO[f.estado]}</span>
-                    <span className="mono muted">
+                    <span className="datos muted">
                       {f.items} ítems · {f.items_con_diferencia} con diferencia
                     </span>
                   </span>

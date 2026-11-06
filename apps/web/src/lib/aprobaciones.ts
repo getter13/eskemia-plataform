@@ -10,7 +10,7 @@ import {
   type OrdenBandeja,
   type ReglaAplicada,
 } from '@eskemia/cliente-api';
-import { formatoMoneda } from './catalogo';
+import { formatearMonto } from './catalogo';
 import { organizacionActual } from './db';
 
 export type { OrdenBandeja };
@@ -26,11 +26,11 @@ const ALCANCE: Record<ReglaAplicada['alcance'], string> = {
 export function motivoAprobacion(o: OrdenBandeja): string {
   const motivos = (o.reglas_aplicadas.reglas_aplicadas ?? []).map((r) =>
     r.modo === 'POR_MONTO' && r.monto_umbral !== null
-      ? `Supera ${formatoMoneda(r.monto_umbral)} en la regla ${ALCANCE[r.alcance]}`
+      ? `Supera ${formatearMonto(r.monto_umbral)} en la regla ${ALCANCE[r.alcance]}`
       : `Regla ${ALCANCE[r.alcance]}: siempre se aprueba`,
   );
   if (o.reglas_aplicadas.excede_limite_rol && o.reglas_aplicadas.limite_rol != null) {
-    motivos.push(`Supera el límite de ${formatoMoneda(o.reglas_aplicadas.limite_rol)} del rol`);
+    motivos.push(`Supera el límite de ${formatearMonto(o.reglas_aplicadas.limite_rol)} del rol`);
   }
   return `${motivos.join('. ') || 'Requiere aprobación'}. Nivel ${o.nivel_requerido}.`;
 }

@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { CheckCheck, Home, Minus, Plus, ReceiptText, Search, ShieldAlert, ShoppingCart, User } from 'lucide-react';
 import { Drawer } from 'vaul';
 import { useCarrito, vibrar } from '../lib/carrito';
-import { formatoMoneda, type ProductoCatalogo } from '../lib/catalogo';
+import { formatearMonto, type ProductoCatalogo } from '../lib/catalogo';
 import { tienePermiso } from '../lib/db';
 import { useSesion } from '../lib/sesion';
 
@@ -54,7 +54,7 @@ export function Stepper({
       >
         <Minus size={20} />
       </button>
-      <span className="mk-cantidad mono" aria-live="polite">
+      <span className="mk-cantidad datos" aria-live="polite">
         {cantidad}
       </span>
       <button
@@ -83,7 +83,7 @@ export function EtiquetaAprobacion({ producto }: { producto: ProductoCatalogo })
   if (producto.regla_modo === 'POR_MONTO' && producto.regla_monto_umbral !== null) {
     return (
       <span className="etiqueta etiqueta-neutra mk-etiqueta">
-        <ShieldAlert size={16} /> Aprobación si supera {formatoMoneda(producto.regla_monto_umbral)}
+        <ShieldAlert size={16} /> Aprobación si supera {formatearMonto(producto.regla_monto_umbral)}
       </span>
     );
   }
@@ -116,7 +116,7 @@ export function HojaProducto({ producto, alCerrar }: { producto: ProductoCatalog
                       <span className="grupo mk-flex">
                         <strong>{o.proveedor}</strong>
                         <span className="muted">{o.presentacion}</span>
-                        <span className="mono">{o.precio === null ? 'Sin precio' : formatoMoneda(o.precio)}</span>
+                        <span className="datos">{o.precio === null ? 'Sin precio' : formatearMonto(o.precio)}</span>
                         {o.preferido && producto.ofertas.length > 1 && (
                           <span className="etiqueta mk-etiqueta">Preferido</span>
                         )}

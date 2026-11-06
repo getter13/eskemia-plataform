@@ -6,7 +6,7 @@ import { useCarrito } from '../../lib/carrito';
 import {
   agruparPedido,
   evaluarOrden,
-  formatoMoneda,
+  formatearMonto,
   useCatalogo,
   type EvaluacionOrden,
   type GrupoProveedor,
@@ -48,14 +48,14 @@ function TarjetaOrden({ grupo, sedeId }: { grupo: GrupoProveedor; sedeId: string
           <span className="grupo mk-flex">
             <span>{l.producto.nombre}</span>
             <span className="muted">{l.oferta.presentacion}</span>
-            <span className="mono">{l.oferta.precio === null ? 'Sin precio' : formatoMoneda(l.subtotal)}</span>
+            <span className="datos">{l.oferta.precio === null ? 'Sin precio' : formatearMonto(l.subtotal)}</span>
           </span>
           <Stepper etiqueta={l.producto.nombre} cantidad={l.cantidad} alCambiar={(c) => fijarCantidad(l.oferta.id, c)} />
         </div>
       ))}
       <div className="fila mk-subtotal">
         <span className="mk-flex">Subtotal</span>
-        <strong className="mono">{formatoMoneda(grupo.subtotal)}</strong>
+        <strong className="datos">{formatearMonto(grupo.subtotal)}</strong>
       </div>
       {minimo !== null && (
         <div className="grupo">
@@ -71,8 +71,8 @@ function TarjetaOrden({ grupo, sedeId }: { grupo: GrupoProveedor; sedeId: string
           </div>
           <span className="muted">
             {faltaMinimo
-              ? `Faltan ${formatoMoneda(minimo - grupo.subtotal)} para el mínimo de ${formatoMoneda(minimo)}`
-              : `Alcanza el mínimo de ${formatoMoneda(minimo)}`}
+              ? `Faltan ${formatearMonto(minimo - grupo.subtotal)} para el mínimo de ${formatearMonto(minimo)}`
+              : `Alcanza el mínimo de ${formatearMonto(minimo)}`}
           </span>
         </div>
       )}
@@ -156,7 +156,7 @@ export function Pedido() {
             <span className="mk-flex">
               Total · {grupos.length} {grupos.length === 1 ? 'orden de compra' : 'órdenes de compra'}
             </span>
-            <strong className="mono">{formatoMoneda(total)}</strong>
+            <strong className="datos">{formatearMonto(total)}</strong>
           </div>
           {noDisponibles.length > 0 && <span className="muted">Quitá lo que ya no está disponible para confirmar.</span>}
           {!puedePedir && <span className="muted">Tu usuario puede ver el catálogo, pero no confirmar pedidos.</span>}

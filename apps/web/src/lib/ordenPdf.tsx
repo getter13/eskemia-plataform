@@ -1,6 +1,6 @@
 // Comprobante de la orden para el proveedor. Este módulo y su librería bajan solo al generar un PDF.
 import { Document, Page, StyleSheet, Text, View, pdf } from '@react-pdf/renderer';
-import { formatoMoneda } from './catalogo';
+import { formatearMonto } from './catalogo';
 import { formatoFecha, formatoFechaHora, formatoNumero } from './formato';
 import type { ItemOrden, OrdenResumen } from './ordenes';
 
@@ -58,12 +58,12 @@ function DocumentoOrden({ orden, items }: { orden: OrdenResumen; items: ItemOrde
             </View>
             <Text style={e.presentacion}>{i.presentacion_nombre}</Text>
             <Text style={e.numero}>{formatoNumero(i.cantidad)}</Text>
-            <Text style={e.numero}>{i.precio_unitario === null ? '-' : formatoMoneda(i.precio_unitario)}</Text>
-            <Text style={e.numero}>{formatoMoneda(i.subtotal)}</Text>
+            <Text style={e.numero}>{i.precio_unitario === null ? '-' : formatearMonto(i.precio_unitario)}</Text>
+            <Text style={e.numero}>{formatearMonto(i.subtotal)}</Text>
           </View>
         ))}
         <View style={e.total}>
-          <Text>Total estimado: {formatoMoneda(orden.total_estimado)}</Text>
+          <Text>Total estimado: {formatearMonto(orden.total_estimado)}</Text>
         </View>
       </Page>
     </Document>

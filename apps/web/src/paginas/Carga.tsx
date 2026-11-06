@@ -64,7 +64,7 @@ function Marcador({ titulo, valor }: { titulo: string; valor: string }) {
   return (
     <span className="grupo">
       <span className="label">{titulo}</span>
-      <span className="mono">{valor}</span>
+      <span className="datos">{valor}</span>
     </span>
   );
 }
@@ -86,7 +86,7 @@ function ModalAltaProducto({
   return (
     <Modal titulo="Producto no cargado" alCerrar={alCerrar}>
       <p>
-        Código <span className="mono">{gtin}</span>. Se da de alta como pendiente de validación.
+        Código <span className="datos">{gtin}</span>. Se da de alta como pendiente de validación.
       </p>
       <label className="grupo">
         <span className="label">Nombre, sin tamaño ni envase</span>
@@ -440,7 +440,7 @@ export function Carga() {
     <div className="pantalla">
       <Encabezado>
         <span className="muted">
-          {recepcion.proveedor_nombre} · <span className="mono">{recepcion.nro_remito}</span>
+          {recepcion.proveedor_nombre} · <span className="datos">{recepcion.nro_remito}</span>
         </span>
       </Encabezado>
 
@@ -521,12 +521,12 @@ export function Carga() {
             >
               <span className="grupo">
                 <strong>{i.producto_nombre}</strong>
-                {i.lote && <span className="mono muted">Lote {i.lote}</span>}
+                {i.lote && <span className="datos muted">Lote {i.lote}</span>}
                 {(i.cant_pedida ?? null) !== null && (
-                  <span className="mono muted">Pedido {formatoCantidad(i.cant_pedida!, i.tipo_medida)}</span>
+                  <span className="datos muted">Pedido {formatoCantidad(i.cant_pedida!, i.tipo_medida)}</span>
                 )}
               </span>
-              <span className="mono">{formatoCantidad(i.cant_recibida, i.tipo_medida)}</span>
+              <span className="datos">{formatoCantidad(i.cant_recibida, i.tipo_medida)}</span>
             </button>
           ))}
         </aside>

@@ -34,7 +34,7 @@ export function Cierre() {
           {resultado === 'CERRADA_OK' ? <CheckCircle2 size={64} /> : <AlertTriangle size={64} />}
           <h1>{ETIQUETA_ESTADO[resultado]}</h1>
           <p>
-            {recepcion.proveedor_nombre} · <span className="mono">{recepcion.nro_remito}</span>
+            {recepcion.proveedor_nombre} · <span className="datos">{recepcion.nro_remito}</span>
           </p>
           <button className="btn btn-primario" onClick={() => navegar('/', { replace: true })}>
             Volver al inicio

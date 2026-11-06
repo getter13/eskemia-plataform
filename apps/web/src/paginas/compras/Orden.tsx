@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { AlertTriangle, Ban, CheckCircle2, ChevronLeft, Circle, CircleSlash, Download, Mail, MessageCircle, Send, ShieldAlert } from 'lucide-react';
 import { Drawer } from 'vaul';
 import { NavCompras } from '../../componentes/compras';
-import { formatoMoneda } from '../../lib/catalogo';
+import { formatearMonto } from '../../lib/catalogo';
 import { tienePermiso } from '../../lib/db';
 import { ETIQUETA_ESTADO, formatoFecha, formatoFechaHora, formatoNumero } from '../../lib/formato';
 import { useSesion } from '../../lib/sesion';
@@ -109,7 +109,7 @@ export function Orden() {
         <button className="mk-paso mk-volver" aria-label="Volver" onClick={() => navegar(-1)}>
           <ChevronLeft size={24} />
         </button>
-        <h1 className="mk-titulo mono mk-numero">{orden?.numero ?? 'Orden de compra'}</h1>
+        <h1 className="mk-titulo datos mk-numero">{orden?.numero ?? 'Orden de compra'}</h1>
       </header>
       <main className="mk-lista grupo-pedido">
         {error && (
@@ -152,7 +152,7 @@ export function Orden() {
                     {p.hecho ? <CheckCircle2 size={20} /> : <Circle size={20} />}
                     <span className="grupo">
                       <span>{p.etiqueta}</span>
-                      {p.fecha && <span className="muted mono">{formatoFechaHora(p.fecha)}</span>}
+                      {p.fecha && <span className="muted datos">{formatoFechaHora(p.fecha)}</span>}
                     </span>
                   </li>
                 ))}
@@ -174,12 +174,12 @@ export function Orden() {
                       </span>
                     )}
                   </span>
-                  <span className="mono">{formatoMoneda(i.subtotal)}</span>
+                  <span className="datos">{formatearMonto(i.subtotal)}</span>
                 </div>
               ))}
               <div className="fila mk-subtotal">
                 <span className="mk-flex">Total estimado</span>
-                <strong className="mono">{formatoMoneda(orden.total_estimado)}</strong>
+                <strong className="datos">{formatearMonto(orden.total_estimado)}</strong>
               </div>
             </section>
 
@@ -192,7 +192,7 @@ export function Orden() {
                   return (
                     <div className="mk-linea" key={s.producto_id}>
                       <span className="mk-flex">{s.producto_nombre}</span>
-                      <span className="mono">
+                      <span className="datos">
                         {formatoNumero(recibido)} de {formatoNumero(pedido)}
                         {recibido !== pedido && ` · ${recibido < pedido ? 'Falta' : 'Sobra'} ${formatoNumero(Math.abs(pedido - recibido))}`}
                       </span>
@@ -203,7 +203,7 @@ export function Orden() {
                 {recepciones.map((r) => (
                   <div className="mk-linea" key={r.id}>
                     <span className="grupo mk-flex">
-                      <span className="mono">{r.nro_remito}</span>
+                      <span className="datos">{r.nro_remito}</span>
                       <span className="muted">{formatoFechaHora(r.abierta_en)}</span>
                     </span>
                     <span className="etiqueta etiqueta-neutra mk-etiqueta">{ETIQUETA_ESTADO[r.estado]}</span>

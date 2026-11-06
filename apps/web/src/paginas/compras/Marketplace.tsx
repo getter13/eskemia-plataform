@@ -7,7 +7,7 @@ import { useCarrito, vibrar } from '../../lib/carrito';
 import {
   agruparPedido,
   filtrarCatalogo,
-  formatoMoneda,
+  formatearMonto,
   rubrosDe,
   useCatalogo,
   type ProductoCatalogo,
@@ -36,14 +36,14 @@ function TarjetaProducto({
         {varias && !enPedido ? (
           <>
             <span className="muted">{ofertas.length} proveedores: elegí a quién comprarle</span>
-            {precios.length > 0 && <span className="mono">Desde {formatoMoneda(Math.min(...precios))}</span>}
+            {precios.length > 0 && <span className="datos">Desde {formatearMonto(Math.min(...precios))}</span>}
           </>
         ) : (
           <>
             <span className="muted">
               {mostrada.presentacion} · {mostrada.proveedor}
             </span>
-            <span className="mono">{mostrada.precio === null ? 'Sin precio' : formatoMoneda(mostrada.precio)}</span>
+            <span className="datos">{mostrada.precio === null ? 'Sin precio' : formatearMonto(mostrada.precio)}</span>
           </>
         )}
         <EtiquetaAprobacion producto={producto} />
@@ -192,7 +192,7 @@ export function Marketplace() {
           <ShoppingCart size={24} />
           <span className="mk-flex">
             {grupos.length} {grupos.length === 1 ? 'proveedor' : 'proveedores'} · {items}{' '}
-            {items === 1 ? 'ítem' : 'ítems'} · {formatoMoneda(total)}
+            {items === 1 ? 'ítem' : 'ítems'} · {formatearMonto(total)}
           </span>
           <strong>Ver pedido</strong>
         </button>

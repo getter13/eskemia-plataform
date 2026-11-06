@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { Link, useNavigate } from 'react-router-dom';
 import { AlertTriangle, ChevronRight, ClipboardList, FileText, CloudOff, FileUp, LogOut, RefreshCw, ScanLine, ShieldCheck, Users } from 'lucide-react';
 import { NavCompras } from '../../componentes/compras';
-import { formatoMoneda } from '../../lib/catalogo';
+import { formatearMonto } from '../../lib/catalogo';
 import { db, tienePermiso } from '../../lib/db';
 import { formatoFechaHora } from '../../lib/formato';
 import { ETIQUETA_ESTADO_OC, recuperarPedido, useOrdenes, type ResumenEnCola } from '../../lib/ordenes';
@@ -43,7 +43,7 @@ export function Pedidos() {
           return (
             <section className="tarjeta grupo mk-orden" data-testid="pedido-en-cola" key={op.seq}>
               <strong>{resumen.proveedores.join(', ')}</strong>
-              <span className="mono">{formatoMoneda(resumen.total)}</span>
+              <span className="datos">{formatearMonto(resumen.total)}</span>
               {op.estado === 'pendiente' ? (
                 <span className="mk-aviso">
                   <RefreshCw size={16} /> Se confirma al volver la señal.
@@ -74,11 +74,11 @@ export function Pedidos() {
           <Link className="mk-tarjeta mk-enlace" data-testid="orden-resumen" key={o.id} to={`/compras/oc/${o.id}`}>
             <span className="grupo mk-flex">
               <strong>{o.proveedores?.nombre}</strong>
-              <span className="mono muted">{o.numero}</span>
+              <span className="datos muted">{o.numero}</span>
               <span className="muted">{formatoFechaHora(o.creado_en)}</span>
               <span className="etiqueta etiqueta-neutra mk-etiqueta">{ETIQUETA_ESTADO_OC[o.estado]}</span>
             </span>
-            <span className="mono">{formatoMoneda(o.total_estimado)}</span>
+            <span className="datos">{formatearMonto(o.total_estimado)}</span>
             <ChevronRight size={20} />
           </Link>
         ))}

@@ -16,8 +16,8 @@ import { guardarMeta, leerMeta } from './db';
 
 export type { EvaluacionOrden, Oferta, ProductoCatalogo };
 
-const moneda = new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-export const formatoMoneda = (n: number) => `$ ${moneda.format(n)}`;
+// La única función de montos vive en formato.ts; se reexporta para las pantallas de Compras.
+export { formatearMonto } from './formato';
 
 export function useCatalogo(sedeId: string | undefined) {
   const [productos, setProductos] = useState<ProductoCatalogo[] | null>(null);

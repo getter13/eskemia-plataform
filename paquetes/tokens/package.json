@@ -1,6 +1,20 @@
 {
   "name": "@eskemia/tokens",
   "private": true,
-  "version": "0.0.0",
-  "description": "Tokens de diseño (tokens.css) del manual de marca Eskemia."
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Tokens del sistema de diseño Eskemia v2: tokens.json (fuente) y tokens.css (generado).",
+  "exports": {
+    "./tokens.css": "./tokens.css",
+    "./tokens.json": "./tokens.json"
+  },
+  "scripts": {
+    "generar": "node scripts/generar.ts",
+    "revisar": "node scripts/revisar.ts ../../apps/web/src",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^7.0.2"
+  }
 }

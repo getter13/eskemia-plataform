@@ -1,0 +1,84 @@
+/* Eskemia · Tokens del sistema de diseño v2.
+ * GENERADO por paquetes/tokens/scripts/generar.ts desde tokens.json. No editar a mano. */
+
+:root {
+  /* Color */
+  --surface-100: #f6f5f1; /* Tarjetas, paneles, barra lateral, buscador y barras flotantes. Papel cálido: nunca blanco puro. */
+  --surface-200: #ebe9e2; /* Fondo de la app (v2) y bloques internos dentro de una tarjeta surface-100. */
+  --line: #d5d2c8; /* Hairlines 1px: divisores y el borde punteado de 'Agregar tarjeta'. Decorativo, nunca como único borde de un control. */
+  --ink: #15181d; /* Texto principal y titulares sobre surface-100/200 (≈16:1). */
+  --ink-muted: #5b6068; /* Texto secundario y metadatos sobre surface-100/200 (≈6:1 / ≈5:1). Íconos de utilidad. */
+  --brand: #0e5e5a; /* Petróleo Eskemia: CTA primario, steppers, contenedor de ícono de la acción principal, estados activos. Texto surface-100 encima (≈7.5:1). */
+  --brand-deep: #08403d; /* Hover/pressed de brand; barra flotante de carrito; texto sobre brand-tint. */
+  --brand-tint: #d3e7e3; /* Contenedores de íconos, ítem de navegación activo, píldoras de estado OK, chip destacado. Texto brand-deep o ink encima. */
+  --accent: #f0a81a; /* Ámbar: 'requiere aprobación', contadores, avisos de novedad, comunidad. NUNCA como texto sobre claro; texto ink encima (≈9:1). */
+  --signal-error: #b4372b; /* Errores y diferencias, siempre con ícono y texto. ≈5.5:1 sobre surface-100. */
+
+  /* Familias: --font-data lleva cifras tabulares (ver .datos en la app). */
+  --font-ui: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Escala tipográfica */
+  --text-display-size: 56px;
+  --text-display-line: 60px;
+  --text-display-weight: 800;
+  --text-display-tracking: -0.03em;
+  --text-h1-size: 40px;
+  --text-h1-line: 46px;
+  --text-h1-weight: 800;
+  --text-h1-tracking: -0.03em;
+  --text-h2-size: 24px;
+  --text-h2-line: 30px;
+  --text-h2-weight: 800;
+  --text-h2-tracking: -0.02em;
+  --text-title-size: 18px;
+  --text-title-line: 24px;
+  --text-title-weight: 800;
+  --text-title-tracking: -0.01em;
+  --text-body-size: 16px;
+  --text-body-line: 24px;
+  --text-body-weight: 500;
+  --text-body-tracking: normal;
+  --text-body-sm-size: 14px;
+  --text-body-sm-line: 20px;
+  --text-body-sm-weight: 500;
+  --text-body-sm-tracking: normal;
+  --text-label-size: 12px;
+  --text-label-line: 16px;
+  --text-label-weight: 700;
+  --text-label-tracking: normal;
+  --text-data-size: 15px;
+  --text-data-line: 20px;
+  --text-data-weight: 700;
+  --text-data-tracking: normal;
+  --text-data-sm-size: 13px;
+  --text-data-sm-line: 18px;
+  --text-data-sm-weight: 500;
+  --text-data-sm-tracking: normal;
+
+  /* Espaciado */
+  --space-1: 4px; /* Gap mínimo entre ítems de navegación. */
+  --space-2: 8px; /* Unidad base. Gap entre píldoras y entre ícono y texto. */
+  --space-3: 12px; /* Gap dentro de tarjetas y entre filas de lista. */
+  --space-4: 16px; /* Gap entre tarjetas, padding de campos y márgenes de pantalla en celular. */
+  --space-5: 20px; /* Padding de tarjetas. */
+  --space-6: 24px; /* Separación entre bloques de una página. */
+  --space-10: 40px; /* Separación entre secciones grandes; pitch de la grilla de puntos de marca. */
+
+  /* Radios */
+  --radius-icon: 10px; /* Contenedor de ícono chico (32px) en navegación. */
+  --radius-control: 14px; /* Ítems de navegación, campos de formulario, contenedor de ícono mediano (40px). */
+  --radius-block: 18px; /* Bloques internos de una tarjeta, accesos rápidos, miniaturas de producto. */
+  --radius-card: 24px; /* Tarjetas, paneles y barra lateral. */
+  --radius-pill: 999px; /* Estados, chips, buscador, steppers, barra de carrito, navegación inferior móvil, avatares. */
+
+  /* Sombras */
+  --shadow-card: 0 1px 2px rgba(21,24,29,0.05), 0 8px 24px rgba(21,24,29,0.05); /* Tarjetas y paneles surface-100 sobre fondo surface-200. Reemplaza al borde. */
+  --shadow-control: 0 1px 2px rgba(21,24,29,0.06); /* Botones secundarios y píldoras sobre surface-200. */
+  --shadow-float: 0 10px 30px rgba(8,64,61,0.30); /* Elementos flotantes: barra de carrito, menús, hojas inferiores. */
+
+  /* Objetivos táctiles */
+  --tactil-escritorio: 44px;
+  --tactil-movil: 48px;
+  --tactil-kiosco: 56px;
+}

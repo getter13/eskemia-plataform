@@ -44,6 +44,12 @@ jobs:
       # Falla si algo fuera de paquetes/cliente-api importa @supabase/supabase-js.
       - name: lint
         run: pnpm lint
+      # tokens.css se genera desde tokens.json: falla si alguien lo editó a mano o no lo regeneró.
+      - name: tokens al día
+        run: pnpm --filter @eskemia/tokens generar && git diff --exit-code -- paquetes/tokens/tokens.css
+      # Estética v2: sin colores, familias, tamaños, radios, sombras ni espaciados a mano.
+      - name: lint de tokens
+        run: pnpm --filter @eskemia/tokens revisar
       - name: build
         run: pnpm -r build
 

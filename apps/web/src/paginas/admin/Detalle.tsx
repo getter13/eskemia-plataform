@@ -216,14 +216,14 @@ export function Detalle() {
               </div>
               <div className="fila-datos">
                 <Celda titulo="Orden de compra">
-                  <span className="mono">{r.oc_numero ?? 'Sin orden de compra'}</span>
+                  <span className="datos">{r.oc_numero ?? 'Sin orden de compra'}</span>
                 </Celda>
                 <Celda titulo="Remito o factura">
-                  <span className="mono">{r.nro_remito}</span>
+                  <span className="datos">{r.nro_remito}</span>
                 </Celda>
                 {datos.cuit && (
                   <Celda titulo="CUIT">
-                    <span className="mono">{formatoCuit(datos.cuit)}</span>
+                    <span className="datos">{formatoCuit(datos.cuit)}</span>
                   </Celda>
                 )}
                 <Celda titulo="Sede">{r.sede}</Celda>
@@ -277,7 +277,7 @@ export function Detalle() {
                   <div className="fila-datos">
                     {i.productos.gtin && (
                       <Celda titulo="GTIN">
-                        <span className="mono">{i.productos.gtin}</span>
+                        <span className="datos">{i.productos.gtin}</span>
                       </Celda>
                     )}
                     {r.oc_id && (
@@ -325,11 +325,11 @@ export function Detalle() {
                     <span className="muted">{formatoFechaHora(l.leido_en)}</span>
                     <span>{l.tipo === 'MANUAL' ? 'Manual' : 'Escaneo'}</span>
                     <strong>{l.productos.nombre}</strong>
-                    <span className="mono">
+                    <span className="datos">
                       {Number(l.cantidad) > 0 ? '+' : ''}
                       {formatoCantidad(Number(l.cantidad), l.productos.tipo_medida)}
                     </span>
-                    <span className="mono muted texto-corte">{l.valor_crudo ?? l.motivo ?? ''}</span>
+                    <span className="datos muted texto-corte">{l.valor_crudo ?? l.motivo ?? ''}</span>
                   </div>
                 ))}
               </div>
@@ -348,7 +348,7 @@ export function Detalle() {
                         {e.usuario_id ? ` · ${datos.usuarios[e.usuario_id] ?? ''}` : ''}
                       </span>
                       {detalle && <span className="texto-corte">{detalle}</span>}
-                      <span className="mono muted">#{e.secuencia}</span>
+                      <span className="datos muted">#{e.secuencia}</span>
                     </li>
                   );
                 })}

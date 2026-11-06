@@ -1,3 +1,13 @@
+/* Eskemia · Estilos de la app (Compras y Recepción).
+ *
+ * Qué hace: estructura, componentes y estados de las pantallas actuales, con valores que
+ * salen SOLO de los tokens de @eskemia/tokens (estética v2). El lint de tokens del CI
+ * falla con colores, familias, tamaños, radios, sombras o espaciados escritos a mano.
+ * Dónde encaja: lo importa main.tsx después de tokens.css. Etapa 3b: se migró sin
+ * rediseñar; el rediseño de cada pantalla llega con su etapa (Compras y Recepción, en la 11).
+ * Pasa las ~300 líneas porque reúne los estilos de todas las pantallas heredadas; se
+ * reparte por módulo en la Etapa 11. */
+
 * {
   box-sizing: border-box;
 }
@@ -8,11 +18,12 @@ body,
   height: 100%;
 }
 
+/* Fondo de la app surface-200; tarjetas y paneles surface-100 encima. */
 body {
   margin: 0;
-  background: var(--surface-100);
+  background: var(--surface-200);
   color: var(--ink);
-  font: 16px/1.4 var(--font-sans);
+  font: var(--text-body-weight) var(--text-body-size)/var(--text-body-line) var(--font-ui);
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior: none;
 }
@@ -20,17 +31,26 @@ body {
 h1,
 h2,
 h3 {
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   margin: 0;
-  font-weight: 600;
 }
 h1 {
-  font-size: 36px;
-  line-height: 1.15;
+  font-size: var(--text-h1-size);
+  line-height: var(--text-h1-line);
+  font-weight: var(--text-h1-weight);
+  letter-spacing: var(--text-h1-tracking);
 }
 h2 {
-  font-size: 24px;
-  line-height: 1.2;
+  font-size: var(--text-h2-size);
+  line-height: var(--text-h2-line);
+  font-weight: var(--text-h2-weight);
+  letter-spacing: var(--text-h2-tracking);
+}
+h3 {
+  font-size: var(--text-title-size);
+  line-height: var(--text-title-line);
+  font-weight: var(--text-title-weight);
+  letter-spacing: var(--text-title-tracking);
 }
 p {
   margin: 0;
@@ -41,19 +61,21 @@ p {
   flex: none;
 }
 
-.mono {
-  font-family: var(--font-mono);
-  font-size: 13px;
+/* Montos, cantidades, OC, remitos, códigos e IDs: misma familia, cifras tabulares. */
+.datos {
+  font-family: var(--font-data);
+  font-size: var(--text-data-sm-size);
+  font-variant-numeric: tabular-nums;
 }
 .muted {
   color: var(--ink-muted);
 }
+/* Etiquetas de grupo: sentence case, sin mayúsculas sostenidas (v2). */
 .label {
   display: block;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: var(--text-label-weight);
   color: var(--ink-muted);
 }
 
@@ -73,7 +95,7 @@ p {
   background: var(--surface-100);
 }
 .marca {
-  font: 600 24px var(--font-display);
+  font: 800 var(--text-h2-size)/var(--text-h2-line) var(--font-ui);
   color: var(--brand);
 }
 .encabezado .espacio {
@@ -121,13 +143,13 @@ p {
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  min-height: var(--tactil);
+  min-height: var(--tactil-kiosco);
   padding: var(--space-2) var(--space-6);
   border: 1px solid var(--ink-muted);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   background: transparent;
   color: var(--ink);
-  font: 600 16px var(--font-sans);
+  font: 700 var(--text-body-size)/var(--text-body-line) var(--font-ui);
   cursor: pointer;
   touch-action: manipulation;
   user-select: none;
@@ -150,7 +172,7 @@ p {
 }
 .btn-grande {
   min-height: 112px;
-  font: 600 36px var(--font-display);
+  font: 800 var(--text-h1-size)/var(--text-h1-line) var(--font-ui);
   padding: var(--space-6) var(--space-10);
 }
 .btn-seleccion[aria-pressed='true'] {
@@ -172,13 +194,13 @@ p {
 /* Formularios */
 .campo {
   width: 100%;
-  min-height: var(--tactil);
+  min-height: var(--tactil-kiosco);
   padding: var(--space-2) var(--space-4);
   border: 1px solid var(--ink-muted);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   background: var(--surface-100);
   color: var(--ink);
-  font: 24px var(--font-sans);
+  font: 500 var(--text-h2-size)/var(--text-h2-line) var(--font-ui);
 }
 .campo:focus {
   outline: 2px solid var(--brand);
@@ -186,10 +208,13 @@ p {
 }
 
 /* Tarjetas */
+/* v2: la tarjeta se separa del fondo con sombra; el borde queda para estados
+ * (transparente en reposo, brand cuando está elegida). */
 .tarjeta {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--surface-200);
+  border: 1px solid transparent;
+  border-radius: var(--radius-card);
+  background: var(--surface-100);
+  box-shadow: var(--shadow-card);
   padding: var(--space-4) var(--space-6);
 }
 .tarjeta-tactil {
@@ -217,20 +242,20 @@ p {
   gap: var(--space-4);
 }
 .grilla-nombre {
-  font: 600 24px var(--font-display);
+  font: 800 var(--text-h2-size)/var(--text-h2-line) var(--font-ui);
 }
 
 /* Etiquetas de estado: nunca solo por color */
 .etiqueta {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px var(--space-2);
-  border-radius: var(--radius-sm);
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill);
   background: var(--brand-tint);
   color: var(--brand-deep);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: var(--text-body-sm-size);
+  font-weight: 700;
 }
 .etiqueta-alerta {
   background: var(--accent);
@@ -254,10 +279,10 @@ p {
   min-height: 48px;
   padding: 0 var(--space-4);
   border: 1px solid var(--line);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   background: transparent;
   color: var(--ink);
-  font: 600 14px var(--font-sans);
+  font: 700 var(--text-body-sm-size)/var(--text-body-sm-line) var(--font-ui);
   cursor: pointer;
 }
 .sync.error {
@@ -316,9 +341,9 @@ p {
   gap: var(--space-4);
   min-height: 72px;
   padding: var(--space-2) var(--space-6);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-card);
   border: 1px solid var(--line);
-  font: 600 24px var(--font-display);
+  font: 800 var(--text-h2-size)/var(--text-h2-line) var(--font-ui);
 }
 .estado-lector.ok {
   background: var(--brand);
@@ -353,18 +378,19 @@ p {
   justify-content: center;
   min-height: 112px;
   border: 1px solid var(--ink-muted);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   background: var(--surface-100);
   color: var(--ink);
-  font: 500 36px var(--font-mono);
+  font: 700 var(--text-h1-size)/var(--text-h1-line) var(--font-data);
+  font-variant-numeric: tabular-nums;
   cursor: pointer;
 }
 .cantidad-valor small {
-  font: 14px var(--font-sans);
+  font: 500 var(--text-body-sm-size)/var(--text-body-sm-line) var(--font-ui);
   color: var(--ink-muted);
 }
 .fila-item {
-  min-height: var(--tactil);
+  min-height: var(--tactil-kiosco);
   padding: var(--space-2) var(--space-4);
   display: flex;
   align-items: center;
@@ -387,7 +413,7 @@ p {
 .fondo-modal {
   position: fixed;
   inset: 0;
-  background: rgb(21 24 29 / 45%);
+  background: color-mix(in srgb, var(--ink) 45%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -399,8 +425,8 @@ p {
   max-height: 100%;
   overflow-y: auto;
   background: var(--surface-100);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 16px 48px rgb(21 24 29 / 30%);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-float);
   padding: var(--space-6);
   display: flex;
   flex-direction: column;
@@ -421,7 +447,8 @@ p {
 }
 .teclado .btn {
   min-height: 72px;
-  font: 500 24px var(--font-mono);
+  font: 700 var(--text-h2-size)/var(--text-h2-line) var(--font-data);
+  font-variant-numeric: tabular-nums;
 }
 .visor {
   min-height: 72px;
@@ -431,11 +458,12 @@ p {
   gap: var(--space-2);
   padding: 0 var(--space-4);
   border: 1px solid var(--ink-muted);
-  border-radius: var(--radius-md);
-  font: 500 36px var(--font-mono);
+  border-radius: var(--radius-control);
+  font: 700 var(--text-h1-size)/var(--text-h1-line) var(--font-data);
+  font-variant-numeric: tabular-nums;
 }
 .visor small {
-  font: 16px var(--font-sans);
+  font: 500 var(--text-body-size)/var(--text-body-line) var(--font-ui);
   color: var(--ink-muted);
 }
 
@@ -457,14 +485,15 @@ p {
     grid-template-columns: 1fr 1fr;
   }
 }
-.valor-mono {
-  font: 500 24px var(--font-mono);
+.valor-datos {
+  font: 700 var(--text-h2-size)/var(--text-h2-line) var(--font-data);
+  font-variant-numeric: tabular-nums;
 }
 .lista-faltantes {
   margin: 0;
   padding-left: var(--space-6);
   color: var(--signal-error);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* Foto */
@@ -472,7 +501,7 @@ p {
   max-height: 280px;
   max-width: 100%;
   border: 1px solid var(--line);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   object-fit: contain;
 }
 
@@ -481,7 +510,7 @@ p {
   width: 100%;
   height: 220px;
   border: 1px solid var(--ink-muted);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   background: var(--surface-100);
   touch-action: none;
 }
@@ -491,7 +520,7 @@ p {
   width: 100%;
   max-height: 420px;
   background: var(--ink);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
 }
 
 .aviso-error {
@@ -499,7 +528,7 @@ p {
   align-items: center;
   gap: var(--space-2);
   color: var(--signal-error);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* Back */
@@ -521,7 +550,7 @@ p {
   max-width: 320px;
 }
 .campo-texto {
-  font-size: 16px;
+  font-size: var(--text-body-size);
   resize: vertical;
 }
 .metricas {
@@ -536,7 +565,8 @@ p {
   gap: var(--space-2);
 }
 .metrica-valor {
-  font: 500 36px var(--font-mono);
+  font: 700 var(--text-h1-size)/var(--text-h1-line) var(--font-data);
+  font-variant-numeric: tabular-nums;
 }
 .fila-bandeja {
   flex-wrap: wrap;
@@ -580,7 +610,7 @@ p {
   align-items: center;
   gap: var(--space-2);
   color: var(--brand);
-  font-weight: 600;
+  font-weight: 700;
 }
 .checklist li.falta {
   color: var(--signal-error);
@@ -606,7 +636,7 @@ p {
   height: 140px;
   object-fit: contain;
   background: var(--surface-100);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-pill);
 }
 .imagen-ampliada {
   max-width: 100%;
@@ -618,7 +648,7 @@ p {
   display: flex;
   flex-direction: column;
   border: 1px solid var(--line);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
 }
 .fila-densa {
   display: grid;
@@ -627,7 +657,7 @@ p {
   align-items: center;
   padding: var(--space-2) var(--space-4);
   border-bottom: 1px solid var(--line);
-  font-size: 14px;
+  font-size: var(--text-body-sm-size);
 }
 .fila-densa:last-child {
   border-bottom: 0;
@@ -682,7 +712,7 @@ body,
   overflow-wrap: anywhere;
 }
 .encabezado .sync {
-  min-height: var(--tactil);
+  min-height: var(--tactil-kiosco);
 }
 .contenido > *,
 .tarjeta-tactil > * {
@@ -692,7 +722,7 @@ body,
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
 }
 .btn-grande {
-  font-size: clamp(24px, 4vw, 36px);
+  font-size: clamp(var(--text-h2-size), 4vw, var(--text-h1-size));
   min-height: clamp(88px, 16dvh, 112px);
 }
 .selector-cantidad {
@@ -703,7 +733,7 @@ body,
   min-height: clamp(88px, 18dvh, 112px);
 }
 .cantidad-valor {
-  font-size: clamp(24px, 3.4vw, 36px);
+  font-size: clamp(var(--text-h2-size), 3.4vw, var(--text-h1-size));
   text-align: center;
 }
 .item-activo h1 {
@@ -714,7 +744,7 @@ body,
 }
 .visor {
   min-height: clamp(56px, 9dvh, 72px);
-  font-size: clamp(24px, 5dvh, 36px);
+  font-size: clamp(var(--text-h2-size), 5dvh, var(--text-h1-size));
 }
 
 /* Tablets chicas o verticales: la lista de cargados va debajo. */
@@ -785,7 +815,7 @@ body,
     order: 1;
   }
   h1 {
-    font-size: 24px;
+    font-size: var(--text-h2-size);
   }
   .metricas {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -805,8 +835,8 @@ body,
 @media (max-height: 640px) {
   .encabezado {
     min-height: 56px;
-    padding-top: 4px;
-    padding-bottom: 4px;
+    padding-top: var(--space-1);
+    padding-bottom: var(--space-1);
   }
   .barra-acciones {
     padding-top: var(--space-2);
@@ -820,15 +850,15 @@ body,
     gap: var(--space-2);
   }
   .estado-lector {
-    min-height: var(--tactil);
-    font-size: 16px;
+    min-height: var(--tactil-kiosco);
+    font-size: var(--text-body-size);
   }
   .item-activo {
     padding: var(--space-2) var(--space-4);
     gap: var(--space-2);
   }
   .item-activo h1 {
-    font-size: 24px;
+    font-size: var(--text-h2-size);
   }
   .fondo-modal {
     padding: var(--space-2);
@@ -877,7 +907,7 @@ body,
 .lista-columnas {
   margin: 0;
   padding-left: var(--space-4);
-  font-size: 14px;
+  font-size: var(--text-body-sm-size);
   overflow-wrap: anywhere;
 }
 
@@ -911,7 +941,7 @@ body,
   min-height: 64px;
 }
 .mk-titulo {
-  font-size: 24px;
+  font-size: var(--text-h2-size);
   line-height: 1.2;
 }
 .mk-buscador {
@@ -921,7 +951,7 @@ body,
   min-height: 48px;
   padding: 0 var(--space-4);
   border: 1px solid var(--ink-muted);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   background: var(--surface-100);
 }
 .mk-buscador:focus-within {
@@ -936,7 +966,7 @@ body,
   outline: 0;
   background: transparent;
   color: var(--ink);
-  font: 16px var(--font-sans);
+  font: 500 var(--text-body-size)/var(--text-body-line) var(--font-ui);
 }
 .mk-chips {
   display: flex;
@@ -948,22 +978,23 @@ body,
   flex: none;
   min-height: 48px;
   padding: 0 var(--space-4);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface-200);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: var(--surface-100);
+  box-shadow: var(--shadow-control);
   color: var(--ink);
-  font: 14px var(--font-sans);
+  font: 500 var(--text-body-sm-size)/var(--text-body-sm-line) var(--font-ui);
 }
 .mk-chip[aria-pressed='true'] {
   border-color: var(--brand);
   background: var(--brand-tint);
-  font-weight: 600;
+  font-weight: 700;
 }
 .mk-aviso {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  font-size: 14px;
+  font-size: var(--text-body-sm-size);
 }
 .mk-lista {
   flex: 1;
@@ -988,31 +1019,31 @@ body,
   align-items: center;
   gap: var(--space-4);
   padding: var(--space-4);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface-200);
+  border-radius: var(--radius-card);
+  background: var(--surface-100);
+  box-shadow: var(--shadow-card);
   cursor: pointer;
 }
 .mk-nombre {
-  font: 600 16px/1.3 var(--font-sans);
+  font: 700 var(--text-body-size)/1.3 var(--font-ui);
   overflow-wrap: anywhere;
 }
 .mk-tarjeta .muted,
 .mk-oferta .muted,
 .mk-linea .muted {
-  font-size: 14px;
+  font-size: var(--text-body-sm-size);
 }
 .mk-etiqueta {
   align-self: flex-start;
   min-height: 0;
-  font-size: 12px;
+  font-size: var(--text-label-size);
 }
 .mk-stepper {
   flex: none;
   display: flex;
   align-items: center;
   border: 1px solid var(--brand);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   background: var(--surface-100);
 }
 .mk-paso {
@@ -1023,7 +1054,7 @@ body,
   width: 48px;
   height: 48px;
   border: 0;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   background: transparent;
   color: var(--brand);
   cursor: pointer;
@@ -1054,14 +1085,14 @@ body,
   gap: var(--space-4);
   padding: var(--space-10) var(--space-4);
   border: 1px solid var(--line);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   background: var(--surface-200);
   text-align: center;
 }
 .mk-esqueleto {
   height: 112px;
   border: 1px solid var(--line);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   background: var(--surface-200);
 }
 .mk-barra-pedido {
@@ -1073,7 +1104,7 @@ body,
   border: 0;
   background: var(--brand);
   color: var(--surface-100);
-  font: 14px var(--font-sans);
+  font: 500 var(--text-body-sm-size)/var(--text-body-sm-line) var(--font-ui);
   text-align: left;
   cursor: pointer;
 }
@@ -1093,18 +1124,18 @@ body,
   gap: 2px;
   min-height: 56px;
   color: var(--ink-muted);
-  font-size: 12px;
+  font-size: var(--text-label-size);
   text-decoration: none;
 }
 .mk-nav-item.activo {
   color: var(--brand);
-  font-weight: 600;
+  font-weight: 700;
 }
 .mk-hoja-fondo {
   position: fixed;
   inset: 0;
   z-index: 10;
-  background: rgb(21 24 29 / 45%);
+  background: color-mix(in srgb, var(--ink) 45%, transparent);
 }
 .mk-hoja {
   position: fixed;
@@ -1119,19 +1150,19 @@ body,
   max-height: 85dvh;
   margin: 0 auto;
   padding: var(--space-2) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom));
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
   background: var(--surface-100);
-  box-shadow: 0 -8px 24px rgb(21 24 29 / 20%);
+  box-shadow: var(--shadow-float);
 }
 .mk-hoja-agarre {
   align-self: center;
   width: 40px;
   height: 4px;
-  border-radius: 2px;
+  border-radius: var(--radius-pill);
   background: var(--line);
 }
 .mk-hoja-titulo {
-  font-size: 24px;
+  font-size: var(--text-h2-size);
   line-height: 1.2;
   overflow-wrap: anywhere;
 }
@@ -1151,7 +1182,7 @@ body,
 }
 .mk-boton {
   min-height: 48px;
-  font-size: 16px;
+  font-size: var(--text-body-size);
 }
 .mk-acceso {
   justify-content: flex-start;
@@ -1166,7 +1197,7 @@ body,
 .mk-progreso {
   height: 8px;
   overflow: hidden;
-  border-radius: 4px;
+  border-radius: var(--radius-pill);
   background: var(--line);
 }
 .mk-progreso span {
@@ -1194,7 +1225,7 @@ body,
 
 /* Seguimiento de la orden */
 .mk-numero {
-  font-size: 16px;
+  font-size: var(--text-body-size);
   overflow-wrap: anywhere;
 }
 .mk-enlace {

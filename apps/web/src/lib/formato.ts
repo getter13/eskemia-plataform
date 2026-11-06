@@ -1,6 +1,24 @@
+// Eskemia · Formatos de la app: montos, cantidades, fechas y CUIT, en es-AR.
+//
+// Qué hace: es el único lugar donde se formatean números para mostrar. Los montos salen
+// SOLO de formatearMonto() (CLAUDE.md, Estética v2): ningún componente arma "$ " a mano.
+// Dónde encaja: lo usan todas las pantallas y el PDF de la orden.
 import type { Estado, TipoMedida } from './db';
 
 const numero = new Intl.NumberFormat('es-AR', { maximumFractionDigits: 3 });
+const moneda = new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+/**
+ * Monto en pesos con el formato de Eskemia: `$ 1.240,50`, negativos `-$ 1.240,50`.
+ * Redondea a 2 decimales (mitad hacia afuera, como Intl). Acepta el texto numérico que
+ * devuelve la base para columnas numeric.
+ */
+export function formatearMonto(valor: number | string): string {
+  const n = typeof valor === 'string' ? Number(valor) : valor;
+  if (!Number.isFinite(n)) return '—';
+  const texto = moneda.format(Math.abs(n));
+  return texto === '0,00' || n >= 0 ? `$ ${texto}` : `-$ ${texto}`;
+}
 const fechaHora = new Intl.DateTimeFormat('es-AR', {
   day: '2-digit',
   month: '2-digit',

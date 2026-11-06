@@ -165,11 +165,11 @@ export function Resumen() {
       </Encabezado>
       <main className="contenido">
         <p className="muted">
-          {recepcion.proveedor_nombre} · <span className="mono">{recepcion.nro_remito}</span>
+          {recepcion.proveedor_nombre} · <span className="datos">{recepcion.nro_remito}</span>
           {recepcion.oc_numero && (
             <>
               {' '}
-              · Orden <span className="mono" data-testid="oc-numero">{recepcion.oc_numero}</span>
+              · Orden <span className="datos" data-testid="oc-numero">{recepcion.oc_numero}</span>
             </>
           )}
         </p>
@@ -199,9 +199,9 @@ export function Resumen() {
               <div className="tarjeta fila-control" key={i.key} data-testid="fila-control">
                 <span className="grupo">
                   <strong>{i.producto_nombre}</strong>
-                  {i.lote && <span className="mono muted">Lote {i.lote}</span>}
+                  {i.lote && <span className="datos muted">Lote {i.lote}</span>}
                   {i.vencimiento && (
-                    <span className="mono muted">Vence {formatoFecha(i.vencimiento)}</span>
+                    <span className="datos muted">Vence {formatoFecha(i.vencimiento)}</span>
                   )}
                   {recepcion.oc_id &&
                     items.every((o) => o.producto_id !== i.producto_id || (o.cant_pedida ?? null) === null) && (
@@ -210,12 +210,12 @@ export function Resumen() {
                 </span>
                 <span className="grupo">
                   <span className="label">Recibido</span>
-                  <span className="mono">{formatoCantidad(i.cant_recibida, i.tipo_medida)}</span>
+                  <span className="datos">{formatoCantidad(i.cant_recibida, i.tipo_medida)}</span>
                 </span>
                 {recepcion.oc_id ? (
                   <span className="grupo">
                     <span className="label">Pedido</span>
-                    <span className="mono" data-testid="cant-pedida">
+                    <span className="datos" data-testid="cant-pedida">
                       {(i.cant_pedida ?? null) === null ? '—' : formatoCantidad(i.cant_pedida!, i.tipo_medida)}
                     </span>
                   </span>

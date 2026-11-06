@@ -111,7 +111,7 @@ function ModalPermisos({
             />
             <span className="grupo">
               <span>{p.descripcion}</span>
-              <span className="mono muted">{p.codigo}</span>
+              <span className="datos muted">{p.codigo}</span>
             </span>
           </label>
         ))}
@@ -185,7 +185,7 @@ export function Roles() {
                   onClick={() => setRolAbiertoId(r.id)}
                 >
                   <span className="espacio-flex">{r.nombre}</span>
-                  <span className="mono muted">
+                  <span className="datos muted">
                     Nivel {r.nivel_aprobacion} · {r.permisos.length} permisos
                   </span>
                 </button>

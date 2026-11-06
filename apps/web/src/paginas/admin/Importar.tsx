@@ -113,7 +113,7 @@ export function Importar() {
           <ul className="lista-columnas">
             {def.columnas.map((c) => (
               <li key={c.nombre}>
-                <span className="mono">{c.nombre}</span>
+                <span className="datos">{c.nombre}</span>
                 {c.requerida ? ' (obligatoria)' : ''}: <span className="muted">{c.ayuda}</span>
               </li>
             ))}
@@ -149,7 +149,7 @@ export function Importar() {
             <ul className="lista-columnas">
               {errores.slice(0, ERRORES_VISIBLES).map((e, i) => (
                 <li key={i}>
-                  {e.fila > 0 && <span className="mono">Fila {e.fila}: </span>}
+                  {e.fila > 0 && <span className="datos">Fila {e.fila}: </span>}
                   {e.mensaje}
                 </li>
               ))}

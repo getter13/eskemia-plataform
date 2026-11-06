@@ -20,7 +20,7 @@ import {
   type SaldoOrden,
 } from '@eskemia/cliente-api';
 import { useCarrito } from './carrito';
-import { formatoMoneda, type GrupoProveedor } from './catalogo';
+import { formatearMonto, type GrupoProveedor } from './catalogo';
 import { db, guardarMeta, leerMeta, organizacionActual } from './db';
 import { formatoFecha, formatoNumero } from './formato';
 import { pedirSincronizacion } from './sync';
@@ -182,7 +182,7 @@ export function textoOrden(o: OrdenResumen, items: ItemOrden[]) {
     '',
     ...lineas,
     '',
-    `Total estimado: ${formatoMoneda(o.total_estimado)}`,
+    `Total estimado: ${formatearMonto(o.total_estimado)}`,
   ].join('\n');
 }
 
