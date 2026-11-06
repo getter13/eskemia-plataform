@@ -107,4 +107,4 @@ En cada etapa con UI usar las skills correspondientes (`page-patterns`, `viewpor
 - Cada módulo, incluidos los del núcleo (Usuarios, Salas, Perfil de empresa), declara sus tarjetas en `modulos/registro.ts` (código, título, permiso que exige, tamaño). El Inicio no conoce a ningún módulo.
 - Una tarjeta es elegible solo si el módulo está habilitado y el usuario tiene su permiso. Lo valida la base (RPC), no la pantalla. Si después pierde el permiso o se deshabilita el módulo, la tarjeta desaparece sin romper el Inicio.
 - "Personalizar inicio" y "Agregar tarjeta" siempre visibles. Sin tarjetas elegidas, el Inicio muestra un estado vacío accionable, nunca una pantalla en blanco.
-- Pendiente de definir: Inicio por defecto por puesto, armado por el administrador como punto de partida.
+- Inicio por defecto por puesto: queda para después del esqueleto (decidido el 06/11/2026).

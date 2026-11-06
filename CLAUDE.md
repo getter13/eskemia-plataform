@@ -132,7 +132,7 @@ El sitio público (apps/sitio) reutiliza estos mismos tokens.
   Inicio de quien lo perdió sin romperlo.
 - UI: botón "Personalizar inicio" y espacio "Agregar tarjeta" siempre visibles; Inicio vacío
   con estado vacío accionable, nunca pantalla en blanco.
-- Abierto: Inicio por defecto por puesto, definido por el administrador como punto de partida.
+- Inicio por defecto por puesto (armado por el administrador como punto de partida): queda para después del esqueleto (decidido el 06/11/2026). Hasta entonces, el Inicio arranca vacío y accionable.
 
 ## SEO y posicionamiento
 
