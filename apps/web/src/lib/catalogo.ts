@@ -1,36 +1,20 @@
-// Catálogo del marketplace. Se trae entero y se guarda en el dispositivo: abre sin señal y
-// la búsqueda responde al instante.
+// Eskemia · Catálogo del marketplace de Compras.
+//
+// Qué hace: se trae entero por @eskemia/cliente-api y se guarda en el dispositivo, así
+// abre sin señal y la búsqueda (tolerante a errores de tipeo) responde al instante. Agrupa
+// el carrito por proveedor: cada grupo será una orden de compra.
+// Dónde encaja: pantallas de Compras (Marketplace, Pedido).
 import { useCallback, useEffect, useState } from 'react';
+import {
+  catalogoCompras,
+  evaluarAprobacion,
+  type EvaluacionOrden,
+  type Oferta,
+  type ProductoCatalogo,
+} from '@eskemia/cliente-api';
 import { guardarMeta, leerMeta } from './db';
-import { supabase } from './supabase';
 
-export interface Oferta {
-  id: string;
-  proveedor_id: string;
-  proveedor: string;
-  proveedor_codigo: string | null;
-  monto_minimo: number | null;
-  plazo_entrega_dias: number | null;
-  presentacion_id: string;
-  presentacion: string;
-  factor: number;
-  precio: number | null;
-  preferido: boolean;
-}
-
-export interface ProductoCatalogo {
-  producto_id: string;
-  sku: string | null;
-  nombre: string;
-  unidad_stock: 'UN' | 'KG' | 'LT';
-  rubro_id: string | null;
-  rubro: string | null;
-  categoria_id: string | null;
-  categoria: string | null;
-  regla_modo: 'NUNCA' | 'SIEMPRE' | 'POR_MONTO' | null;
-  regla_monto_umbral: number | null;
-  ofertas: Oferta[];
-}
+export type { EvaluacionOrden, Oferta, ProductoCatalogo };
 
 const moneda = new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 export const formatoMoneda = (n: number) => `$ ${moneda.format(n)}`;
@@ -46,13 +30,14 @@ export function useCatalogo(sedeId: string | undefined) {
     const guardado = await leerMeta<ProductoCatalogo[]>(clave);
     if (guardado) setProductos((actual) => actual ?? guardado);
 
-    const { data, error: fallo } = await supabase.rpc('catalogo_compras', { p_sede_id: sedeId });
-    if (fallo) {
+    let lista: ProductoCatalogo[];
+    try {
+      lista = await catalogoCompras(sedeId);
+    } catch {
       setSinConexion(true);
       if (!guardado) setError('No se pudo cargar el catálogo. Revisá la conexión.');
       return;
     }
-    const lista = (data ?? []) as ProductoCatalogo[];
     setProductos(lista);
     setSinConexion(false);
     setError(null);
@@ -187,15 +172,14 @@ export function agruparPedido(productos: ProductoCatalogo[], lineas: Record<stri
   };
 }
 
-export interface EvaluacionOrden {
-  requiere_aprobacion: boolean;
-  estado: 'APROBADA' | 'PENDIENTE_APROBACION';
-}
-
+/** Anticipa si la orden de ese proveedor pedirá aprobación; null si no se pudo saber. */
 export async function evaluarOrden(sedeId: string, grupo: GrupoProveedor): Promise<EvaluacionOrden | null> {
-  const { data, error } = await supabase.rpc('evaluar_aprobacion', {
-    p_sede_id: sedeId,
-    p_items: grupo.lineas.map((l) => ({ producto_id: l.producto.producto_id, subtotal: l.subtotal })),
-  });
-  return error ? null : (data as EvaluacionOrden);
+  try {
+    return await evaluarAprobacion(
+      sedeId,
+      grupo.lineas.map((l) => ({ producto_id: l.producto.producto_id, subtotal: l.subtotal })),
+    );
+  } catch {
+    return null;
+  }
 }

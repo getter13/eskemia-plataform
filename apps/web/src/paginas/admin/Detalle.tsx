@@ -348,7 +348,7 @@ export function Detalle() {
                         {e.usuario_id ? ` · ${datos.usuarios[e.usuario_id] ?? ''}` : ''}
                       </span>
                       {detalle && <span className="texto-corte">{detalle}</span>}
-                      <span className="mono muted">#{e.secuencia} · {e.hash.slice(0, 12)}</span>
+                      <span className="mono muted">#{e.secuencia}</span>
                     </li>
                   );
                 })}

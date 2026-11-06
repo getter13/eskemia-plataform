@@ -1,30 +1,21 @@
-// Importación CSV del catálogo. El formato se valida acá y las referencias en el servidor.
+// Eskemia · Importación CSV del catálogo de Compras.
+//
+// Qué hace: define los seis archivos (columnas y validación Zod), lee el CSV como lo
+// exporta Excel en Argentina y manda las filas válidas a la base. El formato se valida
+// acá; las referencias (rubro existente, CUIT cargado…), en el servidor.
+// Dónde encaja: pantalla Admin > Importar. Exige compras.catalogo.gestionar.
 import Papa from 'papaparse';
 import { z } from 'zod';
-import { supabase } from './supabase';
+import {
+  importarCatalogo as importar,
+  type ErrorFila,
+  type ResultadoImportacion,
+  type TipoImportacion,
+} from '@eskemia/cliente-api';
+import { organizacionActual } from './db';
 
-export type TipoImportacion =
-  | 'rubros'
-  | 'categorias'
-  | 'productos'
-  | 'presentaciones'
-  | 'proveedores'
-  | 'precios';
-
-export interface ErrorFila {
-  /** Línea del archivo; 0 si el problema es del archivo entero. */
-  fila: number;
-  mensaje: string;
-}
+export type { ErrorFila, ResultadoImportacion, TipoImportacion };
 export type FilaImportacion = Record<string, unknown> & { fila: number };
-
-export interface ResultadoImportacion {
-  filas: number;
-  creados: number;
-  actualizados: number;
-  errores: ErrorFila[];
-  aplicado: boolean;
-}
 
 /** Excel en Argentina exporta "1.240,50"; también se acepta "1240.50". */
 export function aNumero(texto: string): number {
@@ -272,16 +263,11 @@ export function analizarCsv(def: DefinicionImportacion, texto: string) {
   return { filas, errores };
 }
 
+/** Vista previa (aplicar=false) o aplicación, todo o nada, en la organización actual. */
 export async function importarCatalogo(
   tipo: TipoImportacion,
   filas: FilaImportacion[],
   aplicar: boolean,
 ): Promise<ResultadoImportacion> {
-  const { data, error } = await supabase.rpc('importar_catalogo', {
-    p_tipo: tipo,
-    p_filas: filas,
-    p_aplicar: aplicar,
-  });
-  if (error) throw new Error(error.message.replace(/^[A-Z_]+:\s*/, ''));
-  return data as ResultadoImportacion;
+  return importar(await organizacionActual(), tipo, filas, aplicar);
 }

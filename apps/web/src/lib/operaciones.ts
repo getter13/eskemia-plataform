@@ -1,9 +1,14 @@
-// Acciones del kiosco. Toda operación escribe primero en IndexedDB y encola su envío,
-// en una sola transacción: si la tablet se apaga, no queda una mitad sin la otra.
+// Eskemia · Acciones del kiosco de Recepción.
+//
+// Qué hace: toda operación escribe primero en IndexedDB y encola su envío, en una sola
+// transacción: si la tablet se apaga, no queda una mitad sin la otra.
+// Dónde encaja: lib/sync.ts envía la cola por @eskemia/cliente-api. Los argumentos usan
+// los nombres de las RPC del esquema api (p_organizacion_id primero donde corresponde).
 import { redondear } from './formato';
 import {
   db,
   idDispositivo,
+  organizacionActual,
   type ItemLocal,
   type OpCola,
   type PendienteRecepcion,
@@ -49,6 +54,7 @@ export async function asegurarDispositivo(perfil: Perfil) {
   await db.transaction('rw', db.cola, db.meta, async () => {
     await db.cola.add(
       op('registrar_dispositivo', null, {
+        p_organizacion_id: perfil.organizacion_id,
         p_id: id,
         p_nombre: `Tablet ${id.slice(0, 8)}`,
         p_sede_id: perfil.sede_id,
@@ -63,9 +69,12 @@ export async function altaProveedor(nombre: string, cuit: string): Promise<strin
   const existente = await db.proveedores.where('cuit').equals(cuit).first();
   if (existente) return existente.id;
   const id = crypto.randomUUID();
+  const organizacion = await organizacionActual();
   await db.transaction('rw', db.proveedores, db.cola, async () => {
     await db.proveedores.put({ id, nombre, cuit });
-    await db.cola.add(op('alta_proveedor', null, { p_id: id, p_nombre: nombre, p_cuit: cuit }));
+    await db.cola.add(
+      op('alta_proveedor', null, { p_organizacion_id: organizacion, p_id: id, p_nombre: nombre, p_cuit: cuit }),
+    );
   });
   pedirSincronizacion();
   return id;
@@ -89,10 +98,12 @@ export async function altaProducto(datos: {
     pendiente_validacion: true,
     categoria_id: null,
   };
+  const organizacion = await organizacionActual();
   await db.transaction('rw', db.productos, db.cola, async () => {
     await db.productos.put(producto);
     await db.cola.add(
       op('alta_producto', null, {
+        p_organizacion_id: organizacion,
         p_id: producto.id,
         p_nombre: datos.nombre,
         p_gtin: datos.gtin,
@@ -121,7 +132,7 @@ export async function abrirRecepcion(
   await db.transaction('rw', db.recepciones, db.adjuntos, db.items, db.cola, async () => {
     await db.recepciones.put({
       id,
-      tenant_id: perfil.tenant_id,
+      organizacion_id: perfil.organizacion_id,
       sede_id: perfil.sede_id,
       estado: 'ABIERTA',
       proveedor_id: datos.proveedor_id,
@@ -159,6 +170,7 @@ export async function abrirRecepcion(
     );
     await db.cola.add(
       op('abrir_recepcion', id, {
+        p_organizacion_id: perfil.organizacion_id,
         p_id: id,
         p_proveedor_id: datos.proveedor_id,
         p_nro_remito: datos.nro_remito,
@@ -175,7 +187,7 @@ export async function abrirRecepcion(
 }
 
 async function encolarAdjunto(
-  perfil: Pick<Perfil, 'tenant_id' | 'sede_id'>,
+  perfil: Pick<Perfil, 'organizacion_id' | 'sede_id'>,
   recepcionId: string,
   tipo: TipoAdjunto,
   blob: Blob,
@@ -183,7 +195,8 @@ async function encolarAdjunto(
   itemKey: string | null,
 ) {
   const client_uuid = crypto.randomUUID();
-  const storage_path = `${perfil.tenant_id}/${perfil.sede_id}/${recepcionId}/${client_uuid}.${extension}`;
+  // La política de Storage exige que la ruta empiece por la organización.
+  const storage_path = `${perfil.organizacion_id}/${perfil.sede_id}/${recepcionId}/${client_uuid}.${extension}`;
   await db.adjuntos.put({
     client_uuid,
     recepcion_id: recepcionId,

@@ -1,37 +1,19 @@
-// Bandeja de aprobación de órdenes de compra.
+// Eskemia · Bandeja de aprobación de órdenes de compra.
+//
+// Qué hace: trae la bandeja de la organización actual por @eskemia/cliente-api, aprueba
+// o rechaza, y explica en palabras por qué cada orden necesita aprobación.
+// Dónde encaja: pantalla Compras > Aprobaciones.
+import {
+  aprobarOc as aprobar,
+  bandejaAprobacion,
+  rechazarOc as rechazar,
+  type OrdenBandeja,
+  type ReglaAplicada,
+} from '@eskemia/cliente-api';
 import { formatoMoneda } from './catalogo';
-import { supabase } from './supabase';
+import { organizacionActual } from './db';
 
-interface ReglaAplicada {
-  alcance: 'EMPRESA' | 'RUBRO' | 'CATEGORIA' | 'PRODUCTO';
-  modo: 'SIEMPRE' | 'POR_MONTO';
-  monto_umbral: number | null;
-}
-
-export interface OrdenBandeja {
-  id: string;
-  numero: string;
-  sede: string;
-  proveedor: string;
-  emisor: string | null;
-  creado_en: string;
-  total_estimado: number;
-  nivel_requerido: number;
-  reglas_aplicadas: {
-    excede_limite_rol?: boolean;
-    limite_rol?: number | null;
-    reglas_aplicadas?: ReglaAplicada[];
-  };
-  items: Array<{
-    id: string;
-    producto: string;
-    sku: string | null;
-    presentacion: string;
-    cantidad: number;
-    subtotal: number;
-    disparo_aprobacion: boolean;
-  }>;
-}
+export type { OrdenBandeja };
 
 const ALCANCE: Record<ReglaAplicada['alcance'], string> = {
   EMPRESA: 'de la empresa',
@@ -53,18 +35,13 @@ export function motivoAprobacion(o: OrdenBandeja): string {
   return `${motivos.join('. ') || 'Requiere aprobación'}. Nivel ${o.nivel_requerido}.`;
 }
 
+/** Órdenes que la cuenta puede aprobar en la organización actual. */
 export async function traerBandeja(): Promise<OrdenBandeja[]> {
-  const { data, error } = await supabase.rpc('bandeja_aprobacion');
-  if (error) throw new Error(error.message);
-  return (data ?? []) as OrdenBandeja[];
+  return bandejaAprobacion(await organizacionActual());
 }
 
-async function llamar(nombre: string, args: Record<string, unknown>) {
-  const { error } = await supabase.rpc(nombre, args);
-  if (error) throw new Error(error.message.replace(/^[A-Z_]+:\s*/, ''));
-}
+/** Aprueba una orden pendiente. */
+export const aprobarOc = (id: string) => aprobar(id);
 
-export const aprobarOc = (id: string) => llamar('aprobar_oc', { p_oc_id: id });
-
-export const rechazarOc = (id: string, motivo: string) =>
-  llamar('rechazar_oc', { p_oc_id: id, p_motivo: motivo });
+/** Rechaza una orden pendiente con motivo. */
+export const rechazarOc = (id: string, motivo: string) => rechazar(id, motivo);

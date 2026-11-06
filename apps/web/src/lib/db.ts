@@ -1,3 +1,10 @@
+// Eskemia · Base local del dispositivo (IndexedDB con Dexie).
+//
+// Qué hace: guarda catálogos, recepciones en curso, fotos sin subir y la cola de
+// operaciones pendientes, para que el kiosco y el carrito funcionen sin señal.
+// Dónde encaja: la llenan lib/sync.ts (desde cliente-api) y lib/operaciones.ts (acciones
+// del kiosco). Nada de acá autoriza: quien decide es la base.
+
 import Dexie, { type Table } from 'dexie';
 
 export type TipoMedida = 'UNIDAD' | 'PESO';
@@ -19,9 +26,10 @@ export interface PermisoAsignado {
   sede_id: string | null;
 }
 
+/** La cuenta en la organización con la que trabaja. Hasta la Etapa 5 (/o/:org) es la primera activa. */
 export interface Perfil {
   user_id: string;
-  tenant_id: string;
+  organizacion_id: string;
   sede_id: string;
   permisos: PermisoAsignado[];
   nombre: string;
@@ -91,7 +99,7 @@ export interface PendienteRecepcion {
 
 export interface RecepcionLocal {
   id: string;
-  tenant_id: string;
+  organizacion_id: string;
   sede_id: string;
   estado: Estado;
   proveedor_id: string;
@@ -179,7 +187,9 @@ class EskemiaDb extends Dexie {
   pendientes!: Table<PendienteRecepcion, string>;
 
   constructor() {
-    super('eskemia-recepcion');
+    // Nombre nuevo con la base v1: lo guardado contra el Supabase anterior (tenant_id,
+    // RPC viejas) no se mezcla con lo nuevo.
+    super('eskemia');
     this.version(1).stores({
       categorias: 'id, orden',
       productos: 'id, gtin14, categoria_id',
@@ -205,6 +215,16 @@ export async function leerMeta<T>(clave: string): Promise<T | undefined> {
 
 export function guardarMeta(clave: string, valor: unknown) {
   return db.meta.put({ clave, valor });
+}
+
+/**
+ * Organización con la que trabaja el dispositivo (la guarda la sesión al ingresar).
+ * Funciona sin señal. Lanza si todavía no hay una: no hay datos que mostrar ni operar.
+ */
+export async function organizacionActual(): Promise<string> {
+  const id = await leerMeta<string>('organizacion_actual');
+  if (!id) throw new Error('Todavía no hay una organización elegida en este dispositivo.');
+  return id;
 }
 
 export function idDispositivo(): string {

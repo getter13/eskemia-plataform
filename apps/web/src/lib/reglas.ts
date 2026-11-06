@@ -1,100 +1,56 @@
-// Configuración de la aprobación de órdenes de compra.
-import { supabase } from './supabase';
+// Eskemia · Configuración de la aprobación de órdenes de compra.
+//
+// Qué hace: lee y guarda reglas de aprobación, autoaprobación y límites por rol de la
+// organización actual, por @eskemia/cliente-api.
+// Dónde encaja: pantalla Compras > Reglas. Exige compras.aprobacion.configurar.
+import {
+  datosReglas,
+  fijarAutoaprobacion as fijarAuto,
+  fijarLimiteRol as fijarLimite,
+  guardarRegla as guardar,
+  quitarRegla as quitar,
+  type AlcanceRegla,
+  type DatosReglas,
+  type ModoRegla,
+  type OpcionCatalogo,
+  type ReglaAprobacion,
+  type RolLimite,
+} from '@eskemia/cliente-api';
+import { organizacionActual } from './db';
 
-export type AlcanceRegla = 'EMPRESA' | 'RUBRO' | 'CATEGORIA' | 'PRODUCTO';
-export type ModoRegla = 'NUNCA' | 'SIEMPRE' | 'POR_MONTO';
+export type { AlcanceRegla, DatosReglas, ModoRegla, OpcionCatalogo, ReglaAprobacion, RolLimite };
 
-export interface ReglaAprobacion {
-  id: string;
-  alcance: AlcanceRegla;
-  alcance_id: string | null;
-  modo: ModoRegla;
-  monto_umbral: number | null;
-  nivel_requerido: number;
-}
-export interface OpcionCatalogo {
-  id: string;
-  nombre: string;
-}
-export interface RolLimite {
-  id: string;
-  nombre: string;
-  limite_monto_sin_aprobacion: number | null;
-}
-export interface DatosReglas {
-  reglas: ReglaAprobacion[];
-  rubros: OpcionCatalogo[];
-  categorias: OpcionCatalogo[];
-  productos: OpcionCatalogo[];
-  roles: RolLimite[];
-  permitirAutoaprobacion: boolean;
-}
-
-function exigir<T>(r: { data: T | null; error: { message: string } | null }): T {
-  if (r.error) throw new Error(r.error.message);
-  return r.data as T;
-}
-
+/** Reglas, opciones de alcance, roles y autoaprobación de la organización actual. */
 export async function traerDatosReglas(): Promise<DatosReglas> {
-  const [reglas, rubros, categorias, productos, roles, config] = await Promise.all([
-    supabase
-      .from('reglas_aprobacion')
-      .select('id,alcance,alcance_id,modo,monto_umbral,nivel_requerido')
-      .eq('activa', true),
-    supabase.from('rubros').select('id,nombre').eq('activo', true).order('orden').order('nombre'),
-    supabase.from('categorias').select('id,nombre,rubros(nombre)').eq('activo', true).order('nombre'),
-    supabase.from('productos').select('id,nombre').eq('activo', true).order('nombre'),
-    supabase
-      .from('roles')
-      .select('id,nombre,limite_monto_sin_aprobacion')
-      .eq('activo', true)
-      .order('nombre'),
-    supabase.from('configuracion_empresa').select('permitir_autoaprobacion').maybeSingle(),
-  ]);
-  return {
-    reglas: exigir(reglas) as ReglaAprobacion[],
-    rubros: exigir(rubros) as OpcionCatalogo[],
-    categorias: (
-      exigir(categorias) as unknown as Array<{ id: string; nombre: string; rubros: { nombre: string } | null }>
-    ).map((c) => ({ id: c.id, nombre: c.rubros ? `${c.rubros.nombre} · ${c.nombre}` : c.nombre })),
-    productos: exigir(productos) as OpcionCatalogo[],
-    roles: exigir(roles) as RolLimite[],
-    permitirAutoaprobacion: exigir(config)?.permitir_autoaprobacion ?? true,
-  };
+  return datosReglas(await organizacionActual());
 }
 
-async function llamar(nombre: string, args: Record<string, unknown>) {
-  const { error } = await supabase.rpc(nombre, args);
-  if (error) throw new Error(error.message.replace(/^[A-Z_]+:\s*/, ''));
-}
-
-export const guardarRegla = (
+/** Crea o actualiza la regla de ese alcance. */
+export async function guardarRegla(
   alcance: AlcanceRegla,
   alcanceId: string | null,
   modo: ModoRegla,
   montoUmbral: number | null,
   nivel: number,
-) =>
-  llamar('guardar_regla_aprobacion', {
-    p_alcance: alcance,
-    p_alcance_id: alcanceId,
-    p_modo: modo,
-    p_monto_umbral: montoUmbral,
-    p_nivel_requerido: nivel,
+) {
+  await guardar(await organizacionActual(), {
+    alcance,
+    alcance_id: alcanceId,
+    modo,
+    monto_umbral: montoUmbral,
+    nivel_requerido: nivel,
   });
+}
 
 /** Desactivarla hace que los ítems vuelvan a la regla del nivel superior. */
-export const quitarRegla = (r: ReglaAprobacion) =>
-  llamar('guardar_regla_aprobacion', {
-    p_alcance: r.alcance,
-    p_alcance_id: r.alcance_id,
-    p_modo: r.modo,
-    p_monto_umbral: r.monto_umbral,
-    p_nivel_requerido: r.nivel_requerido,
-    p_activa: false,
-  });
+export async function quitarRegla(r: ReglaAprobacion) {
+  await quitar(await organizacionActual(), r);
+}
 
-export const fijarAutoaprobacion = (permitir: boolean) => llamar('fijar_autoaprobacion', { p_permitir: permitir });
+/** Permite o no aprobar las propias órdenes con nivel suficiente. */
+export async function fijarAutoaprobacion(permitir: boolean) {
+  await fijarAuto(await organizacionActual(), permitir);
+}
 
-export const fijarLimiteRol = (rolId: string, limite: number | null) =>
-  llamar('fijar_limite_rol', { p_rol_id: rolId, p_limite: limite });
+/** Monto que un rol puede pedir sin aprobación (null: sin límite). */
+export const fijarLimiteRol = (rolId: string, limite: number | null) => fijarLimite(rolId, limite);

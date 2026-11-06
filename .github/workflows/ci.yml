@@ -41,6 +41,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: tsc
         run: pnpm -r typecheck
+      # Falla si algo fuera de paquetes/cliente-api importa @supabase/supabase-js.
+      - name: lint
+        run: pnpm lint
       - name: build
         run: pnpm -r build
 

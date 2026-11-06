@@ -1,6 +1,20 @@
 {
   "name": "@eskemia/contratos",
   "private": true,
-  "version": "0.0.0",
-  "description": "Esquemas Zod y tipos generados de la base, compartidos entre front y api."
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Esquemas Zod y tipos generados de la base, compartidos entre front y api.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generar": "sh scripts/generar-tipos.sh",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
 }

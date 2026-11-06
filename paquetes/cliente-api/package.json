@@ -1,6 +1,20 @@
 {
   "name": "@eskemia/cliente-api",
   "private": true,
-  "version": "0.0.0",
-  "description": "Única puerta a Supabase: el único paquete que importa @supabase/supabase-js."
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Única puerta a Supabase: el único paquete que importa @supabase/supabase-js.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@eskemia/contratos": "workspace:*",
+    "@supabase/supabase-js": "^2.118.0"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
 }

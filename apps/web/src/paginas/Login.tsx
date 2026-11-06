@@ -1,6 +1,7 @@
+// Eskemia · Ingreso (provisorio hasta las páginas públicas de la Etapa 4).
 import { useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { ingresar } from '@eskemia/cliente-api';
 
 export function Login() {
   const [email, setEmail] = useState('');
@@ -19,7 +20,10 @@ export function Login() {
           e.preventDefault();
           setEnviando(true);
           setError(null);
-          const { error: fallo } = await supabase.auth.signInWithPassword({ email, password: clave });
+          const fallo = await ingresar(email, clave).then(
+            () => false,
+            () => true,
+          );
           setEnviando(false);
           if (fallo) {
             setError(

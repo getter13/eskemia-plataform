@@ -87,7 +87,7 @@ function Rutas() {
       />
       <Route
         path="/admin/roles"
-        element={<Requiere permiso="admin.usuarios.gestionar"><Roles /></Requiere>}
+        element={<Requiere permiso="nucleo.usuarios.gestionar"><Roles /></Requiere>}
       />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

@@ -141,7 +141,7 @@ export function Bandeja() {
         <button className="btn" onClick={() => navegar('/')}>
           <ScanLine size={24} /> Ir al kiosco
         </button>
-        {tienePermiso(perfil, 'admin.usuarios.gestionar') && (
+        {tienePermiso(perfil, 'nucleo.usuarios.gestionar') && (
           <button className="btn" onClick={() => navegar('/admin/roles')}>
             <Users size={24} /> Usuarios y roles
           </button>

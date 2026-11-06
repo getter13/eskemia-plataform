@@ -7,7 +7,7 @@ Línea base v1 (Etapa 2 del plan, `docs/planes/plan-ejecucion-esqueleto.md`).
 | `migraciones/` | SQL que se aplica en orden, una sola vez, solo hacia adelante. |
 | `semillas/` | Catálogos globales idempotentes: módulos, permisos y puestos. Se corren siempre. |
 | `pruebas/` | Tests pgTAP. Cada archivo corre en una transacción con ROLLBACK. |
-| `scripts/` | `aplicar.sh`, `reset.sh` (solo local y CI) y `pruebas.sh`. |
+| `scripts/` | `aplicar.sh`, `reset.sh` y `demo.sh` (solo local y CI) y `pruebas.sh`. |
 | `legado/` | Migraciones del MVP (Supabase cloud). Solo lectura, como referencia. |
 
 ## Uso (con el stack de `infra/compose` levantado)
@@ -16,7 +16,15 @@ Línea base v1 (Etapa 2 del plan, `docs/planes/plan-ejecucion-esqueleto.md`).
 sh db/scripts/aplicar.sh       # migraciones pendientes + semillas
 sh db/scripts/reset.sh         # BORRA la base local y la rearma (pide confirmación)
 sh db/scripts/pruebas.sh       # todos los tests; o pasá archivos puntuales
+sh db/scripts/demo.sh          # cuenta y organización demo para probar la app (solo local)
 ```
+
+`demo.sh` crea la cuenta `demo@eskemia.test` (contraseña `eskemia-demo-local`, solo de
+desarrollo), titular de la organización "Demo" con un catálogo mínimo. Se niega a correr
+con `ESKEMIA_ENTORNO=produccion`.
+
+Después de una migración que cambie el esquema `api`, regenerá los tipos del front:
+`pnpm --filter @eskemia/contratos generar`.
 
 ## Tests
 

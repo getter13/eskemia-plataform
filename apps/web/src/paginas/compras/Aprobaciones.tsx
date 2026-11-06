@@ -4,8 +4,9 @@ import { Drawer } from 'vaul';
 import { NavCompras } from '../../componentes/compras';
 import { formatoMoneda } from '../../lib/catalogo';
 import { formatoFechaHora, formatoNumero } from '../../lib/formato';
+import { alCambiarOrdenes } from '@eskemia/cliente-api';
 import { aprobarOc, motivoAprobacion, rechazarOc, traerBandeja, type OrdenBandeja } from '../../lib/aprobaciones';
-import { supabase } from '../../lib/supabase';
+import { useSesion } from '../../lib/sesion';
 
 const SEGUNDOS_DESHACER = 5;
 
@@ -15,6 +16,7 @@ interface Aprobacion {
 }
 
 export function Aprobaciones() {
+  const organizacionId = useSesion().perfil?.organizacion_id;
   const [ordenes, setOrdenes] = useState<OrdenBandeja[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [enCurso, setEnCurso] = useState<Aprobacion | null>(null);
@@ -50,16 +52,13 @@ export function Aprobaciones() {
 
   useEffect(() => {
     void cargar();
-    const canal = supabase
-      .channel('bandeja-aprobacion')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'ordenes_compra' }, () => void cargar())
-      .subscribe();
+    const dejarDeEscuchar = organizacionId ? alCambiarOrdenes(organizacionId, () => void cargar()) : null;
     return () => {
-      void supabase.removeChannel(canal);
+      dejarDeEscuchar?.();
       // Salir de la pantalla no cancela una aprobación ya pedida.
       void confirmarPendiente();
     };
-  }, [cargar, confirmarPendiente]);
+  }, [cargar, confirmarPendiente, organizacionId]);
 
   async function aprobar(orden: OrdenBandeja) {
     await confirmarPendiente();

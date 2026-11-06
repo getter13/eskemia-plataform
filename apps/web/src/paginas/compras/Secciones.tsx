@@ -103,7 +103,7 @@ const ACCESOS = [
   { permiso: 'compras.oc.ver_todas', ruta: '/compras/oc', etiqueta: 'Órdenes de compra', Icono: FileText },
   { permiso: 'compras.aprobacion.configurar', ruta: '/compras/reglas', etiqueta: 'Reglas de aprobación', Icono: ShieldCheck },
   { permiso: 'compras.catalogo.gestionar', ruta: '/admin/importar', etiqueta: 'Importar catálogo', Icono: FileUp },
-  { permiso: 'admin.usuarios.gestionar', ruta: '/admin/roles', etiqueta: 'Usuarios y roles', Icono: Users },
+  { permiso: 'nucleo.usuarios.gestionar', ruta: '/admin/roles', etiqueta: 'Usuarios y roles', Icono: Users },
 ];
 
 export function PerfilCompras() {

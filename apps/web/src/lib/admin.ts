@@ -1,7 +1,18 @@
-// Consultas del back. A diferencia del kiosco, requiere conexión: muestra el estado real del servidor.
-import type { Estado, TipoAdjunto, TipoDiferencia, TipoLectura, TipoMedida } from './db';
+// Eskemia · Back de Recepción: bandeja, detalle, validación y exportación.
+//
+// Qué hace: adapta lo que devuelve @eskemia/cliente-api a las pantallas del back y arma
+// el CSV del día. A diferencia del kiosco, requiere conexión: muestra el estado real del
+// servidor.
+// Dónde encaja: pantallas Admin > Bandeja y Detalle.
+import {
+  bandejaRecepciones,
+  datosExportacion,
+  detalleRecepcion,
+  rechazarRecepcion as rechazar,
+  validarRecepcion as validar,
+} from '@eskemia/cliente-api';
+import { organizacionActual, type Estado, type TipoAdjunto, type TipoDiferencia, type TipoLectura, type TipoMedida } from './db';
 import { formatoFecha, formatoFechaHora, formatoNumero } from './formato';
-import { BUCKET_ADJUNTOS, supabase } from './supabase';
 
 export type Semaforo = 'OK' | 'CON_DIFERENCIAS' | 'CONTROL_INCOMPLETO';
 
@@ -93,7 +104,6 @@ export interface EventoDetalle {
   payload: Record<string, unknown>;
   usuario_id: string | null;
   creado_en: string;
-  hash: string;
 }
 
 export interface Detalle {
@@ -106,17 +116,7 @@ export interface Detalle {
   usuarios: Record<string, string>;
 }
 
-const COLUMNAS_BANDEJA =
-  'id,sede,estado,proveedor_id,proveedor,nro_remito,usuario_id,abierta_en,cerrada_en,validada_por,validada_en,observacion,fecha,items,items_con_diferencia,checklist,remito_duplicado,semaforo,oc_id,oc_numero';
-
-const COLUMNAS_ITEM =
-  'id,cant_remito,cant_recibida,cant_pedida,diferencia,tipo_diferencia,motivo_diferencia,lote,vencimiento,productos(nombre,gtin,tipo_medida,pendiente_validacion)';
-
-function exigir<T>(r: { data: T | null; error: { message: string } | null }): T {
-  if (r.error) throw new Error(r.error.message);
-  return r.data as T;
-}
-
+/** Hoy en Buenos Aires, como aaaa-mm-dd. */
 export function fechaHoy(): string {
   // en-CA da aaaa-mm-dd.
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date());
@@ -128,81 +128,31 @@ export function moverFecha(fecha: string, dias: number): string {
   return d.toISOString().slice(0, 10);
 }
 
+/** Recepciones del día (aaaa-mm-dd) en la organización actual. */
 export async function traerBandeja(fecha: string): Promise<FilaBandeja[]> {
-  return exigir(
-    await supabase
-      .from('v_recepciones_bandeja')
-      .select(COLUMNAS_BANDEJA)
-      .eq('fecha', fecha)
-      .order('abierta_en', { ascending: false }),
-  ) as unknown as FilaBandeja[];
+  return (await bandejaRecepciones(await organizacionActual(), fecha)) as unknown as FilaBandeja[];
 }
 
+/** Detalle completo de una recepción, o null si no existe o no se puede ver. */
 export async function traerDetalle(id: string): Promise<Detalle | null> {
-  const fila = exigir(
-    await supabase.from('v_recepciones_bandeja').select(COLUMNAS_BANDEJA).eq('id', id).maybeSingle(),
-  ) as unknown as FilaBandeja | null;
-  if (!fila) return null;
-
-  const [proveedor, items, lecturas, adjuntos, eventos, perfiles] = await Promise.all([
-    supabase.from('proveedores').select('cuit').eq('id', fila.proveedor_id).maybeSingle(),
-    supabase.from('recepcion_items').select(COLUMNAS_ITEM).eq('recepcion_id', id).order('creado_en'),
-    supabase
-      .from('lecturas')
-      .select('id,tipo,valor_crudo,cantidad,motivo,leido_en,productos(nombre,tipo_medida)')
-      .eq('recepcion_id', id)
-      .order('leido_en'),
-    supabase
-      .from('adjuntos')
-      .select('id,tipo,storage_path,anulado_en,creado_en')
-      .eq('recepcion_id', id)
-      .order('creado_en'),
-    supabase
-      .from('eventos')
-      .select('id,secuencia,accion,payload,usuario_id,creado_en,hash')
-      .eq('entidad', 'recepcion')
-      .eq('entidad_id', id)
-      .order('secuencia'),
-    supabase.from('perfiles').select('user_id,nombre'),
-  ]);
-
-  const listaAdjuntos = exigir(adjuntos) as Array<Omit<AdjuntoDetalle, 'url'>>;
-  const urls = new Map<string, string>();
-  if (listaAdjuntos.length > 0) {
-    const firmadas = exigir(
-      await supabase.storage.from(BUCKET_ADJUNTOS).createSignedUrls(
-        listaAdjuntos.map((a) => a.storage_path),
-        3600,
-      ),
-    );
-    for (const f of firmadas) {
-      if (f.path && f.signedUrl) urls.set(f.path, f.signedUrl);
-    }
-  }
-
+  const d = await detalleRecepcion(id);
+  if (!d) return null;
   return {
-    recepcion: fila,
-    cuit: exigir(proveedor)?.cuit ?? null,
-    items: exigir(items) as unknown as ItemDetalle[],
-    lecturas: exigir(lecturas) as unknown as LecturaDetalle[],
-    adjuntos: listaAdjuntos.map((a) => ({ ...a, url: urls.get(a.storage_path) ?? null })),
-    eventos: exigir(eventos) as unknown as EventoDetalle[],
-    usuarios: Object.fromEntries(
-      (exigir(perfiles) as Array<{ user_id: string; nombre: string }>).map((p) => [p.user_id, p.nombre]),
-    ),
+    recepcion: d.recepcion as unknown as FilaBandeja,
+    cuit: d.cuit,
+    items: d.items as unknown as ItemDetalle[],
+    lecturas: d.lecturas as unknown as LecturaDetalle[],
+    adjuntos: d.adjuntos as unknown as AdjuntoDetalle[],
+    eventos: d.eventos as unknown as EventoDetalle[],
+    usuarios: d.usuarios,
   };
 }
 
-async function llamar(nombre: string, args: Record<string, unknown>) {
-  const { error } = await supabase.rpc(nombre, args);
-  if (error) throw new Error(error.message.replace(/^[A-Z_]+:\s*/, ''));
-}
+/** Valida una recepción cerrada (observación opcional). */
+export const validarRecepcion = (id: string, observacion: string) => validar(id, observacion || null);
 
-export const validarRecepcion = (id: string, observacion: string) =>
-  llamar('validar_recepcion', { p_recepcion_id: id, p_observacion: observacion || null });
-
-export const rechazarRecepcion = (id: string, observacion: string) =>
-  llamar('rechazar_recepcion', { p_recepcion_id: id, p_observacion: observacion });
+/** Rechaza una recepción para que el kiosco la corrija. */
+export const rechazarRecepcion = (id: string, observacion: string) => rechazar(id, observacion);
 
 // ---------------------------------------------------------------------------
 // Exportación
@@ -245,20 +195,15 @@ const celdaNumero = (n: number | null | undefined) =>
 
 export async function generarCsv(fecha: string): Promise<string> {
   const recepciones = await traerBandeja(fecha);
-  const ids = recepciones.map((r) => r.id);
-
-  const [items, proveedores] = ids.length
-    ? await Promise.all([
-        supabase.from('recepcion_items').select(`recepcion_id,${COLUMNAS_ITEM}`).in('recepcion_id', ids),
-        supabase.from('proveedores').select('id,cuit').in('id', recepciones.map((r) => r.proveedor_id)),
-      ])
-    : [{ data: [], error: null }, { data: [], error: null }];
+  const { items, cuits } = await datosExportacion(
+    recepciones.map((r) => r.id),
+    recepciones.map((r) => r.proveedor_id),
+  );
 
   const porRecepcion = new Map<string, ItemDetalle[]>();
-  for (const i of exigir(items) as unknown as Array<ItemDetalle & { recepcion_id: string }>) {
+  for (const i of items as unknown as Array<ItemDetalle & { recepcion_id: string }>) {
     porRecepcion.set(i.recepcion_id, [...(porRecepcion.get(i.recepcion_id) ?? []), i]);
   }
-  const cuits = new Map((exigir(proveedores) as Array<{ id: string; cuit: string }>).map((p) => [p.id, p.cuit]));
 
   const filas = recepciones.flatMap((r) => {
     const comunes = [
