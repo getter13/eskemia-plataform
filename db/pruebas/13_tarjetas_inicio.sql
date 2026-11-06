@@ -15,9 +15,9 @@ do $$
 declare
   o uuid := pruebas.id('org');
 begin
-  perform pruebas.no('el operario dispone de las tarjetas de su rol y de Salas',
+  perform pruebas.no('el operario dispone de las tarjetas de su rol, de Salas y de las del núcleo sin permiso',
     (select string_agg(codigo, ',' order by codigo) from api.tarjetas_disponibles where organizacion_id = o)
-    is distinct from 'colab.salas,recepcion.hoy,recepcion.pendientes');
+    is distinct from 'colab.salas,nucleo.accesos,nucleo.equipo,recepcion.hoy,recepcion.pendientes');
   perform api.guardar_inicio(o, '[{"codigo": "recepcion.hoy"}, {"codigo": "colab.salas"}]');
   perform pruebas.no('guarda tarjetas elegibles', (select count(*) from api.mi_inicio) <> 2);
   perform pruebas.falla('rechaza una tarjeta sin permiso', 'PRECONDICION: estas tarjetas no están disponibles para vos: compras.pendientes',

@@ -13,6 +13,11 @@ procesos operativos y administrativos con trazabilidad. Se despliega en tres mod
 mismo código: Cloud compartido, Cloud dedicado y Local. Plan vigente:
 docs/planes/plan-ejecucion-esqueleto.md.
 
+**Modelos de negocio (definidos el 03/11, mapeados el 06/11/2026).** (1) Servicios de Eskemia
+con los datos en la base del cliente = modo **Local** (el mismo stack de infra/compose en su
+servidor). (2) Todo en la nube de Eskemia = **Cloud compartido**, o **Cloud dedicado** si paga
+aislamiento. Ninguna decisión de base, login, archivos u hosting puede impedir alguno de los dos.
+
 **Qué documento manda.** En alcance, orden de etapas y modelo de datos manda el plan. En lo
 visual manda la sección "Estética v2" de este archivo (valores en paquetes/tokens/tokens.json).
 En el comportamiento de la interfaz manda docs/principios-ux.md. Si dos documentos se
@@ -64,6 +69,9 @@ contradicen, se pregunta antes de seguir.
 - Estética: sección "Estética v2" de este archivo. Comportamiento: docs/principios-ux.md.
 - Mobile first a 375 px. Barra de navegación vertical a la IZQUIERDA en escritorio
   (posición en --nav-lado), colapsada en tablet, barra inferior + hoja en celular.
+  En celular, fuera de una herramienta rige la barra global (Inicio · Herramientas · Salas ·
+  Menú); dentro de Compras o Recepción, la barra propia del módulo (como la referencia visual),
+  con un acceso para volver al shell. El kiosco de Recepción sigue a pantalla completa.
 - Zona superior de la barra: selector de organización, Inicio, Perfil de empresa, Usuarios,
   Salas de reuniones, Herramientas (Compras, Recepción). Zona inferior: Perfil personal,
   Cuenta, Privacidad, Cerrar sesión.
@@ -105,7 +113,12 @@ El sitio público (apps/sitio) reutiliza estos mismos tokens.
 - Inicio **no** es de ningún módulo: no muestra datos de Compras ni de otro módulo por defecto.
 - Se arma con **tarjetas**. Cada módulo declara las suyas en modulos/registro.ts
   (id, título, permiso requerido, tamaño). Los módulos del núcleo (Usuarios, Salas, Perfil de
-  empresa) también ofrecen tarjetas.
+  empresa) también ofrecen tarjetas, además de "Accesos rápidos" (cada acceso, según su
+  permiso) y "Equipo" (miembros activos de la organización).
+- Las **burbujas de estado** de arriba del Inicio ("1 recepción en curso", "1 sala activa")
+  siguen las mismas reglas que las tarjetas: las declara cada módulo y solo se ven con el
+  módulo habilitado y el permiso. "En turno" (asistencia) es del futuro módulo de RR.HH.: hasta
+  entonces no se muestra.
 - **Cada usuario arma su propio Inicio**, eligiendo solo entre las tarjetas de las
   herramientas que el administrador de la organización le habilitó. Una tarjeta es elegible si
   el módulo está habilitado en la organización y el usuario tiene el permiso; lo valida la base

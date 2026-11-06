@@ -278,8 +278,8 @@ organización con la organización en la URL (/o/:org). Guardá la última organ
 - **Zona superior:** selector de organización · Inicio · Perfil de empresa · Usuarios · Salas de reuniones · separador con rótulo "Herramientas" · Compras · Recepción.
 - **Zona inferior:** avatar y nombre · Perfil personal · Cuenta · Privacidad · Cerrar sesión.
 - Cada ítem se muestra solo si el usuario tiene el permiso de entrada; las herramientas, además, si el módulo está habilitado.
-- Tablet (768 a 1023 px): barra colapsada por defecto. Celular: barra inferior con Inicio · Herramientas · Salas · Menú; Menú abre una hoja inferior con la lista completa.
-- `/o/:org` (Inicio): tarjetas que cada persona elige entre las de sus herramientas habilitadas (sección "Inicio" del CLAUDE.md), con "Personalizar inicio" y "Agregar tarjeta" siempre visibles; sin tarjetas, estado vacío accionable ("Agregá tu primera tarjeta", "Completá el perfil de tu empresa", "Invitá a tu equipo"). La base ya valida qué tarjetas puede elegir (`api.tarjetas_disponibles`, `api.guardar_inicio`).
+- Tablet (768 a 1023 px): barra colapsada por defecto. Celular: barra inferior global con Inicio · Herramientas · Salas · Menú; Menú abre una hoja inferior con la lista completa. Dentro de una herramienta, la barra inferior es la del módulo (decidido el 06/11/2026), con un acceso para volver al shell.
+- `/o/:org` (Inicio): tarjetas que cada persona elige entre las de sus herramientas habilitadas (sección "Inicio" del CLAUDE.md), con "Personalizar inicio" y "Agregar tarjeta" siempre visibles; sin tarjetas, estado vacío accionable ("Agregá tu primera tarjeta", "Completá el perfil de tu empresa", "Invitá a tu equipo"). La base ya valida qué tarjetas puede elegir (`api.tarjetas_disponibles`, `api.guardar_inicio`). Tarjetas del núcleo: Accesos rápidos, Equipo (miembros activos), Usuarios, Perfil de empresa. Arriba, burbujas de estado con las mismas reglas que las tarjetas; "en turno" queda para RR.HH. Si las burbujas necesitan distinguirse de las tarjetas en el catálogo de la base, la columna se lista y se aprueba al empezar la etapa.
 - Posición de la barra en una variable de layout (`--nav-lado`), para invertirla sin tocar componentes.
 
 **Entregable:** navegación completa con teclado, sin desplazamiento horizontal de 375 a 1280 px; un operario sin permisos de administración no ve Usuarios.
@@ -371,6 +371,8 @@ habilitable por organización (código colab, ya registrado en nucleo.modulos).
 - Actualizar `docs/guion-prueba-compras.md` al modelo nuevo (organización, membresías, cuenta demo) y correrlo de punta a punta.
 - Íconos de Compras y Recepción: de Lucide a Phosphor sólidos en contenedores; al terminar, quitar `lucide-react` y la excepción de ESLint.
 - Repartir `apps/web/src/styles/app.css` por módulo (hoy pasa las ~300 líneas, justificado en su cabecera).
+- Fuera del alcance (decisión del 03/11, confirmada el 06/11/2026): "Repetir último pedido" y "Lo que más pedís", aunque aparezcan en la referencia visual.
+- Montos siempre con `formatearMonto()` y dos decimales (`$ 21.400,00`), aunque la referencia los muestre redondeados.
 
 **Entregable:** el guion de Compras → Recepción pasa completo; deshabilitar Compras en una organización la quita de la barra y bloquea sus RPC.
 

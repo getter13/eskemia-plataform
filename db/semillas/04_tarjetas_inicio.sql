@@ -6,7 +6,11 @@
 -- Dónde encaja: db/scripts/aplicar.sh la corre después de las migraciones. Validación
 -- en nucleo.tarjeta_elegible (migración 20261106001500).
 
+-- Accesos rápidos y Equipo: de la referencia visual (06/11/2026). Sin permiso propio: cada
+-- acceso se muestra según su permiso, y Equipo lista miembros activos, visibles para todo miembro.
 insert into nucleo.tarjetas_inicio (codigo, modulo, permiso_codigo, titulo) values
+  ('nucleo.accesos',         'nucleo',    null,                             'Accesos rápidos'),
+  ('nucleo.equipo',          'nucleo',    null,                             'Equipo'),
   ('nucleo.usuarios',        'nucleo',    'nucleo.usuarios.gestionar',      'Usuarios'),
   ('nucleo.perfil_empresa',  'nucleo',    'nucleo.organizacion.configurar', 'Perfil de empresa'),
   ('colab.salas',            'colab',     null,                             'Salas de reuniones'),
