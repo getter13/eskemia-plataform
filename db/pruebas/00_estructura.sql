@@ -16,13 +16,15 @@ insert into sin_organizacion values
   ('nucleo.organizaciones', 'su id es la organización'),
   ('nucleo.permisos', 'catálogo global'),
   ('nucleo.modulos', 'catálogo global'),
-  ('nucleo.puestos', 'catálogo global en las filas con organizacion_id nulo');
+  ('nucleo.puestos', 'catálogo global en las filas con organizacion_id nulo'),
+  ('nucleo.tarjetas_inicio', 'catálogo global de tarjetas del Inicio');
 
 create temp table politicas_sin_es_miembro (politica text primary key, motivo text);
 insert into politicas_sin_es_miembro values
   ('nucleo.cuentas.cuentas_select', 'propia o de alguien que comparte organización'),
   ('nucleo.permisos.permisos_select', 'catálogo global'),
-  ('nucleo.modulos.modulos_select', 'catálogo global');
+  ('nucleo.modulos.modulos_select', 'catálogo global'),
+  ('nucleo.tarjetas_inicio.tarjetas_inicio_select', 'catálogo global');
 
 create temp view tablas as
   select n.nspname || '.' || c.relname as tabla, c.oid, c.relrowsecurity, c.relforcerowsecurity

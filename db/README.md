@@ -26,6 +26,7 @@ sh db/scripts/pruebas.sh       # todos los tests; o pasá archivos puntuales
 - `02_nucleo_rpc`: organizaciones, invitaciones, suspensión, titularidad, Inicio, módulos.
 - `03` a `12`: los 10 tests de Compras y Recepción portados del legado, autónomos:
   cada uno arma su organización con `pruebas.escenario()` (ver `pruebas/_ayudantes.sql`).
+- `13_tarjetas_inicio`: el Inicio acepta solo tarjetas elegibles y oculta las que se pierden.
 
 ## Archivos de más de ~300 líneas (justificación)
 
