@@ -1,11 +1,15 @@
-# Eskemia · CI mínimo
+# Eskemia · CI
 #
 # Qué hace, en cada push y pull request:
 #   1. web:     tsc (chequeo de tipos) y build de todo el workspace pnpm.
 #   2. compose: valida que infra/compose/docker-compose.yml + overlay de
 #               desarrollo resuelvan con .env.example (sin levantar nada).
-#   3. secretos: gitleaks sobre TODO el historial de git.
-# Dónde encaja: plan de ejecución, Etapas 0 y 1 (monorepo pnpm; la versión de
+#   3. sql:     levanta un Supabase efímero (secretos nuevos en cada corrida),
+#               aplica db/migraciones y semillas, y corre los tests pgTAP de
+#               db/pruebas: aislamiento A/B, RLS forzado, RPC del núcleo y los
+#               tests de Compras y Recepción portados del legado.
+#   4. secretos: gitleaks sobre TODO el historial de git.
+# Dónde encaja: plan de ejecución, Etapas 0, 1 y 2 (monorepo pnpm; la versión de
 # pnpm sale del campo packageManager del package.json raíz).
 # Actions fijadas por SHA de commit; gitleaks por versión y checksum.
 
@@ -50,6 +54,29 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: docker compose config
         run: docker compose --env-file .env.example config --quiet
+
+  sql:
+    name: tests SQL (pgTAP)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # crear-env.sh usa node para el par de claves de Auth.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+      - name: secretos efímeros
+        run: sh infra/compose/utils/crear-env.sh
+      - name: levantar base, Auth, Storage y PostgREST
+        working-directory: infra/compose
+        run: docker compose up -d --wait db auth rest storage
+      - name: aplicar migraciones y semillas
+        run: sh db/scripts/aplicar.sh
+      - name: tests pgTAP
+        run: sh db/scripts/pruebas.sh
+      - name: logs del stack
+        if: failure()
+        working-directory: infra/compose
+        run: docker compose logs --tail 80 db auth storage rest
 
   gitleaks:
     name: gitleaks
