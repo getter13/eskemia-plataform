@@ -70,6 +70,10 @@ prefijos al configurar.
 
 ### 1.4 Autenticación segura
 
+> **Actualización 06/11/2026:** el plan de ejecución del esqueleto (que manda) cambió esta
+> sección: registro público **abierto** con confirmación de email, contraseña mínima 12, y
+> SMTP necesario (Mailpit en desarrollo). Ver `infra/compose/README.md`.
+
 Estado actual en `config.toml`: contraseña mínima de 6, sin requisitos, registro abierto,
 sin confirmación. Eso no va a producción. Configuración objetivo:
 

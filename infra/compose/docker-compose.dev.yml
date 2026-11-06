@@ -1,0 +1,34 @@
+# Eskemia · Overlay de desarrollo
+#
+# Qué hace: agrega Mailpit como servidor SMTP de desarrollo. Captura TODOS los
+# correos que manda Auth (verificación, recuperación, invitaciones) y, más
+# adelante, apps/api. Ninguno sale a internet.
+# Dónde encaja: se aplica sobre docker-compose.yml vía COMPOSE_FILE en .env.
+# En producción este archivo NO se incluye y SMTP_* apunta a un proveedor real.
+#
+# Bandeja web: http://localhost:8025
+
+services:
+
+  mailpit:
+    container_name: eskemia-mailpit
+    image: axllent/mailpit:v1.33.0
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    ports:
+      - 127.0.0.1:8025:8025 # interfaz web
+      - 127.0.0.1:1025:1025 # SMTP, para pruebas desde el host
+    environment:
+      # Si un cliente se autentica, acepta cualquier credencial sin TLS (solo desarrollo).
+      MP_SMTP_AUTH_ACCEPT_ANY: "1"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "1"
+      MP_MAX_MESSAGES: "1000"
+
+  auth:
+    depends_on:
+      mailpit:
+        condition: service_healthy

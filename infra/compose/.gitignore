@@ -1,0 +1,14 @@
+# Eskemia · infra/compose: lo que nunca va a git.
+# Secretos del entorno (además de la regla global del repo).
+.env
+.env.old
+*.old
+# Datos locales descartables: base, archivos de Storage y snippets de Studio.
+volumes/db/data/
+volumes/storage/*
+!volumes/storage/.gitkeep
+volumes/snippets/*
+!volumes/snippets/.gitkeep
+# Overrides personales.
+docker-compose.override.yml
+backups/
