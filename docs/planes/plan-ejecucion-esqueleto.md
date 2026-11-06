@@ -2,9 +2,15 @@
 
 Nov 5, 2026 · @Nicolas
 
+> **06/11/2026:** se suma la Etapa 3b (tokens y estética v2), aprobada por el CEO. Este plan
+> manda en alcance, orden de etapas y modelo de datos; en lo visual manda la sección
+> "Estética v2" del `CLAUDE.md` de la raíz, y en el comportamiento de la interfaz,
+> `docs/principios-ux.md`. Donde este plan decía "manual de marca", hoy rige el sistema de
+> diseño Eskemia v2 (`paquetes/tokens/tokens.json`).
+
 ## Alcance
 
-**Se construye el esqueleto funcional del núcleo: index con registro e ingreso, creación de la organización, y un shell con barra vertical a la izquierda que aloja perfil de empresa, usuarios, salas de reuniones y las herramientas Compras y Recepción.** Estimación: 34 a 48 días de trabajo efectivo (7 a 10 semanas), 12 etapas más un cierre, con un commit cada una.
+**Se construye el esqueleto funcional del núcleo: index con registro e ingreso, creación de la organización, y un shell con barra vertical a la izquierda que aloja perfil de empresa, usuarios, salas de reuniones y las herramientas Compras y Recepción.** Estimación: 36 a 51 días de trabajo efectivo (7 a 10 semanas), 13 etapas (0 a 11, más la 3b) y un cierre, con un commit cada una.
 
 **Entra:**
 
@@ -120,7 +126,7 @@ eskemia/
 ├─ paquetes/
 │  ├─ cliente-api/                    única puerta a Supabase (nadie más importa supabase-js)
 │  ├─ contratos/                      esquemas Zod + tipos generados de la base
-│  └─ tokens/                         tokens.css del manual de marca
+│  └─ tokens/                         tokens.json del sistema de diseño v2 → tokens.css generado
 ├─ db/
 │  ├─ migraciones/                    línea base v1
 │  ├─ pruebas/                        pgTAP
@@ -134,7 +140,7 @@ eskemia/
 
 ## Etapas de ejecución
 
-**Doce etapas, un commit cada una; las tres primeras no muestran nada en pantalla pero son las que hacen que el resto escale.** Cada prompt asume que el `CLAUDE.md` de la sección final ya está en la raíz del repo.
+**Trece etapas, un commit cada una; las primeras no muestran nada en pantalla pero son las que hacen que el resto escale.** Cada prompt asume que el `CLAUDE.md` vigente está en la raíz del repo.
 
 ### Etapa 0 · Entorno local idéntico a producción (2 a 4 días)
 
@@ -209,9 +215,30 @@ una con JSDoc). Agregá una regla de ESLint que prohíba importar @supabase/supa
 de cliente-api. Migrá las llamadas existentes de Compras y Recepción a cliente-api.
 ```
 
+Hecha el 06/11/2026: los tipos se generan con el postgres-meta del stack
+(`pnpm --filter @eskemia/contratos generar`), sin sumar el CLI de Supabase.
+
+### Etapa 3b · Tokens y estética v2 (2 a 3 días)
+
+- `paquetes/tokens`: script que genera `tokens.css` desde `tokens.json`, con variables nombradas por uso (`--font-ui`, `--font-data`, `--radius-card`, `--shadow-card`…). El CSS generado se commitea y no se edita a mano.
+- Manrope autoalojada en woff2 (`@font-face`, `font-display: swap`, pesos 400 a 800). Verificar sus cifras tabulares; si no alcanzan, se elige otra familia libre con tnum y solo cambia el token.
+- Librería de íconos sólidos: confirmar Phosphor (MIT).
+- `formatearMonto()` única en el front; ningún componente arma "$ " a mano.
+- Lint en CI que falla con hex, `rgb()`, px fuera de escala o familias fuera de tokens.
+- Las pantallas actuales de Compras y Recepción pasan a la tipografía, los radios, las sombras y el fondo v2, sin rediseño. Íconos y rediseño completo, en la Etapa 11.
+
+**Entregable:** la app ya no carga IBM Plex ni Space Grotesk; un hex escrito a mano hace fallar el CI; todos los montos salen de `formatearMonto()`.
+
+```text
+Etapa 3b. Generá tokens.css desde paquetes/tokens/tokens.json con nombres por uso,
+autoalojá Manrope (woff2) y verificá sus cifras tabulares, confirmá la librería de íconos
+sólidos, creá formatearMonto() y un lint de tokens en el CI. Pasá las pantallas actuales a
+la tipografía, radios, sombras y fondo de la estética v2 del CLAUDE.md, sin rediseñarlas.
+```
+
 ### Etapa 4 · Index, registro e ingreso (3 a 4 días)
 
-- `/` index: nombre Eskemia, propuesta de valor en una frase, dos acciones (Crear cuenta gratis · Ingresar). Mobile first, manual de marca.
+- `/` index: nombre Eskemia, propuesta de valor en una frase, dos acciones (Crear cuenta gratis · Ingresar). Mobile first, estética v2.
 - `/registro`: nombre, apellido, email, contraseña (indicador de fortaleza), aceptación de términos (texto provisorio). Validación al salir del campo.
 - `/verificar`: pantalla "Revisá tu email" con reenvío; el enlace confirma y entra.
 - `/ingresar`, `/recuperar`, `/restablecer`.
@@ -223,7 +250,7 @@ de cliente-api. Migrá las llamadas existentes de Compras y Recepción a cliente
 ```text
 Etapa 4. Construí las páginas públicas en apps/web/src/nucleo/publico: index, registro,
 verificar, ingresar, recuperar y restablecer, con Supabase Auth vía cliente-api. Aplicá
-el manual de marca y docs/principios-ux.md; usá las skills page-patterns, forms, labels,
+la estética v2 del CLAUDE.md (tokens de paquetes/tokens) y docs/principios-ux.md; usá las skills page-patterns, forms, labels,
 errors y verbs, y cerrá con ux-audit. Textos en español rioplatense con voseo. Trigger
 en la base que crea nucleo.cuentas al registrarse. Guardas de rutas públicas/privadas
 conservando el destino.
@@ -251,7 +278,7 @@ organización con la organización en la URL (/o/:org). Guardá la última organ
 - **Zona inferior:** avatar y nombre · Perfil personal · Cuenta · Privacidad · Cerrar sesión.
 - Cada ítem se muestra solo si el usuario tiene el permiso de entrada; las herramientas, además, si el módulo está habilitado.
 - Tablet (768 a 1023 px): barra colapsada por defecto. Celular: barra inferior con Inicio · Herramientas · Salas · Menú; Menú abre una hoja inferior con la lista completa.
-- `/o/:org` (Inicio): accesos a las herramientas y estado vacío útil ("Completá el perfil de tu empresa", "Invitá a tu equipo").
+- `/o/:org` (Inicio): tarjetas que cada persona elige entre las de sus herramientas habilitadas (sección "Inicio" del CLAUDE.md), con "Personalizar inicio" y "Agregar tarjeta" siempre visibles; sin tarjetas, estado vacío accionable ("Agregá tu primera tarjeta", "Completá el perfil de tu empresa", "Invitá a tu equipo"). La base ya valida qué tarjetas puede elegir (`api.tarjetas_disponibles`, `api.guardar_inicio`).
 - Posición de la barra en una variable de layout (`--nav-lado`), para invertirla sin tocar componentes.
 
 **Entregable:** navegación completa con teclado, sin desplazamiento horizontal de 375 a 1280 px; un operario sin permisos de administración no ve Usuarios.
@@ -369,7 +396,7 @@ El esqueleto está terminado cuando se cumplen los diez puntos; cualquiera pendi
 
 - [ ] Una persona se registra, verifica su email, crea su organización y llega al panel en menos de un minuto.
 - [ ] Invita a otra persona, que crea su cuenta desde el email y entra con el rol asignado.
-- [x] Una cuenta que pertenece a dos organizaciones cambia entre ellas sin volver a ingresar.
+- [ ] Una cuenta que pertenece a dos organizaciones cambia entre ellas sin volver a ingresar.
 - [ ] Tests de aislamiento en verde: ningún usuario de A lee ni escribe datos de B, en ninguna tabla.
 - [ ] Un miembro suspendido pierde el acceso en la siguiente consulta, sin esperar a que venza su token.
 - [ ] La barra izquierda, colapsada y móvil funcionan sin desplazamiento horizontal de 375 a 1280 px y con teclado.
@@ -380,65 +407,7 @@ El esqueleto está terminado cuando se cumplen los diez puntos; cualquiera pendi
 
 ## CLAUDE.md del repositorio
 
-Reemplaza al `CLAUDE.md` actual en la raíz. Los de Compras y Recepción pasan a `docs/planes/` como referencia de cada módulo.
-
-```markdown
-# Eskemia · Contexto para Claude Code (núcleo)
-
-Eskemia es una plataforma multi-organización (ERP/CRM/POS + agentes de IA) para estandarizar
-procesos operativos y administrativos con trazabilidad. Se despliega en tres modos con el
-mismo código: Cloud compartido, Cloud dedicado y Local. Plan vigente:
-docs/planes/plan-ejecucion-esqueleto.md. Ante dudas de diseño, ese documento manda.
-
-## Vocabulario
-- Cuenta: identidad global de una persona (auth.users + nucleo.cuentas).
-- Organización: la unidad de negocio (antes "tenant"). Sede: ubicación dentro de ella.
-- Membresía: vínculo cuenta ↔ organización, con puesto, roles y estado.
-- Módulo / herramienta: Compras, Recepción, Salas. Se habilita por organización.
-
-## Stack
-- Lenguajes: TypeScript (estricto) y SQL/PL-pgSQL. No agregar otros.
-- Base: Supabase self-hosted (compose en infra/compose, versiones fijadas).
-- Web: React + Vite + TS, PWA, React Router, TanStack Query, Zustand, Zod, Radix, Vaul, Dexie.
-- apps/api: Node LTS + Hono. Solo integraciones externas (hoy: envío de emails desde pgmq).
-- Monorepo pnpm. CI en GitHub Actions.
-
-## Reglas no negociables
-- Toda tabla con datos de una organización: organizacion_id NOT NULL + RLS FORZADO con
-  (select nucleo.es_miembro(organizacion_id)). Catálogos globales: listados en el test de RLS.
-- Solo el esquema api se expone a PostgREST (vistas security_invoker + RPC).
-- Toda escritura por RPC: valida permiso (nucleo.tiene_permiso), módulo habilitado y estado,
-  y escribe en eventos. Nunca updates directos desde el front.
-- El código consulta permisos por código ('compras.oc.aprobar'), nunca nombres de rol,
-  y nunca pregunta por el modo de despliegue.
-- Ningún archivo fuera de paquetes/cliente-api importa @supabase/supabase-js.
-- Cada módulo nuevo: esquema SQL + entrada en modulos/registro.ts + permisos + tests + doc.
-- Migraciones solo hacia adelante, una nueva por cambio. db/legado/ es solo lectura.
-- Tests de aislamiento A/B para toda tabla nueva.
-
-## Comentarios (obligatorio)
-- Cabecera en cada archivo: qué hace y dónde encaja.
-- JSDoc en toda función exportada.
-- En cada RPC: qué hace, precondiciones, permisos que exige y eventos que escribe.
-- Ningún archivo de src supera ~300 líneas sin justificación escrita.
-
-## UI
-- Manual de marca Eskemia (tokens en paquetes/tokens) y docs/principios-ux.md.
-- Mobile first a 375 px. Barra de navegación vertical a la IZQUIERDA en escritorio
-  (posición en --nav-lado), barra inferior + hoja en celular.
-- Skills VectorLab en cada etapa con UI; cerrar con ux-audit.
-- Español rioplatense con voseo; 1.240,50; dd/mm/aaaa; $ 1.240,50.
-
-## Fuera de alcance en esta etapa
-Precios, planes, pasarelas de pago, suscripciones, voz, Eskemia Local.
-
-## Forma de trabajo
-- Una etapa por commit, con resumen corto al cerrar.
-- Antes de crear tablas o RPC nuevas, listarlas y esperar OK.
-- Secretos solo en .env (fuera de git). Nunca service_role en el front.
-- Pedir confirmación antes de operaciones destructivas.
-- Si falta un dato, preguntar. No inventar.
-```
+El `CLAUDE.md` vigente vive en la raíz del repo y es el único. La copia que estaba acá se quitó el 06/11/2026 para no tener dos versiones que se contradigan. Los de Compras y Recepción quedaron en `docs/planes/` como referencia de cada módulo.
 
 ## Lo que necesito antes de arrancar
 

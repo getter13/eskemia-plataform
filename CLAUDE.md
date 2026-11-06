@@ -11,7 +11,12 @@
 Eskemia es una plataforma multi-organización (ERP/CRM/POS + agentes de IA) para estandarizar
 procesos operativos y administrativos con trazabilidad. Se despliega en tres modos con el
 mismo código: Cloud compartido, Cloud dedicado y Local. Plan vigente:
-docs/planes/plan-ejecucion-esqueleto.md. Ante dudas de diseño, ese documento manda.
+docs/planes/plan-ejecucion-esqueleto.md.
+
+**Qué documento manda.** En alcance, orden de etapas y modelo de datos manda el plan. En lo
+visual manda la sección "Estética v2" de este archivo (valores en paquetes/tokens/tokens.json).
+En el comportamiento de la interfaz manda docs/principios-ux.md. Si dos documentos se
+contradicen, se pregunta antes de seguir.
 
 ## Vocabulario
 - Cuenta: identidad global de una persona (auth.users + nucleo.cuentas).
@@ -82,12 +87,12 @@ de escala o familias tipográficas fuera de tokens.
 | Radios | Tokens radius-icon 10 · radius-control 14 · radius-block 18 · radius-card 24 · radius-pill 999 |
 | Píldoras | Estados, chips de filtro, buscador, botones de acción secundaria, barra fija de carrito/confirmación y navegación inferior móvil |
 | Profundidad | Fondo de la app surface-200; tarjetas y paneles surface-100 con `--shadow-card` (0 1px 2px rgba(21,24,29,.05), 0 8px 24px rgba(21,24,29,.05)). Elementos flotantes (barra de carrito, menús, hojas) con `--shadow-float`. Los bordes quedan para estados: error, borrador/en curso (punteado), foco |
-| Íconos | Sólidos (relleno), dentro de contenedores redondeados: brand-tint con ícono brand, o brand con ícono surface-100 para la acción principal. Librería abierta con variante sólida (candidata: Phosphor, MIT; confirmar en la etapa de tokens). Íconos de solo trazo únicamente para utilidades chicas (buscar, flechas, cerrar) |
+| Íconos | Sólidos (relleno), dentro de contenedores redondeados: brand-tint con ícono brand, o brand con ícono surface-100 para la acción principal. Librería abierta con variante sólida (candidata: Phosphor, MIT; confirmar en la Etapa 3b). Íconos de solo trazo únicamente para utilidades chicas (buscar, flechas, cerrar) |
 | Estados | Píldora con ícono + texto, nunca solo color |
 | Transparencias | Solo en sombras. Sin glassmorphism, sin desenfoques, sin degradados decorativos |
 | Táctil | ≥ 44 px en escritorio, ≥ 48 px en celular, ≥ 56 px en el kiosco de Recepción |
 
-Pendiente de verificar en la etapa de tokens: calidad de las cifras tabulares de Manrope.
+Pendiente de verificar en la Etapa 3b (tokens): calidad de las cifras tabulares de Manrope.
 Si no alcanza, se elige otra familia libre con tnum y solo cambia el token.
 El sitio público (apps/sitio) reutiliza estos mismos tokens.
 
