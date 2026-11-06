@@ -1,6 +1,8 @@
 # Eskemia · Principios UX/UI (todos los módulos)
 
 > Rige para todos los módulos de Eskemia. Los colores, tipografías y tokens salen del manual de marca Eskemia; este documento define **cómo se usa** la interfaz, no cómo se ve.
+>
+> **Sistema de diseño v2 (aprobado por el CEO el 06/11/2026).** Los valores viven en `paquetes/tokens/tokens.json`; las reglas de uso, en la sección 9.
 
 ## 1. Para quién diseñamos
 
@@ -76,10 +78,28 @@ Antes de la primera pantalla, correr una vez `/vectorlab-ux-skills:setup-ui-ux-s
 
 | Pregunta | Respuesta |
 |---|---|
-| Referencia estética | Mercado Libre / PedidosYa en flujo; manual de marca Eskemia en lo visual (sobrio, bordes antes que sombras) |
+| Referencia estética | Mercado Libre / PedidosYa en flujo; sistema de diseño Eskemia v2 en lo visual (sobrio; radios y sombras solo por token) |
 | Antipatrones prohibidos | Glassmorphism, degradados decorativos, CTAs múltiples por vista, ilustraciones caricaturescas, modales centrados en móvil, spinners de pantalla completa |
 | Accesibilidad | WCAG 2.2 AA |
 | Voz | Español rioplatense con voseo ("Confirmá el pedido"), directo, sin tecnicismos |
-| Íconos | Lucide, trazo 1.5 px |
+| Íconos | Sólidos dentro de contenedores (v2). Librería: pendiente de definir |
 
 En cada etapa con UI usar las skills correspondientes (`page-patterns`, `viewports`, `forms`, `surfaces`, `loaders`, `empty-states`, `errors`, `verbs`, `motion`) y cerrar con `ux-audit`.
+
+## 9. Sistema de diseño v2
+
+| Tema | Regla |
+|---|---|
+| Tipografía | Manrope es la única familia. Sin monoespaciada |
+| Cifras | Tabulares en todo dato numérico (montos, cantidades, tablas), vía `--font-data` |
+| Tokens | Se usan por nombre de uso (`--font-ui`, `--font-data`, `--radius-card`, `--shadow-card`…), nunca primitivos ni valores sueltos |
+| Color, radio, sombra | Solo por token. Nada de hex, `rgb()`, radios o sombras escritos a mano |
+| Íconos | Sólidos, dentro de un contenedor |
+| Montos | Siempre con `formatearMonto()`: `$ 1.240,50` |
+
+## 10. Inicio personalizable
+
+- Cada usuario arma su Inicio con tarjetas, por organización: elige cuáles ve y en qué orden.
+- Cada módulo declara sus tarjetas en `modulos/registro.ts` (código, título, permiso que exige). El Inicio no conoce a ningún módulo.
+- Una tarjeta solo aparece si el módulo está habilitado y el usuario tiene su permiso.
+- Sin elección guardada, se muestran las tarjetas por defecto que declara cada módulo.

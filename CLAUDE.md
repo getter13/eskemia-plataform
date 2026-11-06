@@ -3,6 +3,7 @@
 > Plan de ejecución completo (12 etapas + cierre, con prompts): https://claude.ai/artifact/EgZhTeHoHzLQDBPbdUne2A
 > Copiar este archivo como CLAUDE.md en la raíz del repo. Los CLAUDE.md de Compras y Recepción pasan a docs/planes/.
 > Aprobado por el CEO el 05/11/2026 (barra de navegación a la izquierda).
+> Sistema de diseño v2 e Inicio personalizable aprobados por el CEO el 06/11/2026.
 
 Eskemia es una plataforma multi-organización (ERP/CRM/POS + agentes de IA) para estandarizar
 procesos operativos y administrativos con trazabilidad. Se despliega en tres modos con el
@@ -43,6 +44,16 @@ docs/planes/plan-ejecucion-esqueleto.md. Ante dudas de diseño, ese documento ma
 
 ## UI
 - Manual de marca Eskemia (tokens en paquetes/tokens) y docs/principios-ux.md.
+- Sistema de diseño Eskemia v2 (aprobado por el CEO el 06/11/2026):
+  - Fuente de verdad: paquetes/tokens/tokens.json. tokens.css se GENERA desde ahí; no se edita a mano.
+  - Manrope es la única familia. Cifras tabulares en datos (--font-data). Sin monoespaciada.
+  - Colores, radios y sombras solo por token con nombre por uso (--font-ui, --font-data,
+    --radius-card, --shadow-card…). Prohibidos hex, rgb() y radios o sombras escritos a mano
+    en componentes y CSS de la app.
+  - Íconos sólidos dentro de contenedores.
+  - Montos siempre con formatearMonto(); nunca armar "$ " a mano.
+- Inicio personalizable por usuario: cada módulo declara sus tarjetas en modulos/registro.ts;
+  la base guarda solo qué tarjetas eligió cada usuario en cada organización y en qué orden.
 - Mobile first a 375 px. Barra de navegación vertical a la IZQUIERDA en escritorio
   (posición en --nav-lado), colapsada en tablet, barra inferior + hoja en celular.
 - Zona superior de la barra: selector de organización, Inicio, Perfil de empresa, Usuarios,
