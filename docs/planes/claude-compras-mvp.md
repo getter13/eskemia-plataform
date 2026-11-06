@@ -1,3 +1,5 @@
+> **HISTÓRICO.** Contexto del MVP de Compras sobre Supabase cloud (tenant_id, usuario_roles, manual de marca v1). No rige: manda el CLAUDE.md de la raíz. Se conserva como referencia del módulo.
+
 # Eskemia · Módulo de Compras (MVP)
 
 ## Contexto del proyecto

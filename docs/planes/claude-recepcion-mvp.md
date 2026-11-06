@@ -1,3 +1,5 @@
+> **HISTÓRICO.** Contexto del MVP de Recepción sobre Supabase cloud (tenant_id, perfiles, manual de marca v1). No rige: manda el CLAUDE.md de la raíz. Se conserva como referencia del módulo.
+
 # Eskemia · Módulo de Recepción de Mercadería (MVP)
 
 ## Contexto del proyecto

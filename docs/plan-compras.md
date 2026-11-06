@@ -1,3 +1,5 @@
+> **HISTÓRICO.** Plan del módulo de Compras del MVP (modelo con tenant_id). Sus reglas de negocio se portaron a la línea base v1 (db/migraciones); para el modelo de datos vigente, ver docs/planes/plan-ejecucion-esqueleto.md.
+
 # Eskemia · Módulo de Compras — Plan de implementación (v3)
 
 > v3: marketplace mobile first con experiencia tipo Mercado Libre / PedidosYa, PWA instalable y confirmación sin señal. Principios UX transversales en `docs/principios-ux.md`.

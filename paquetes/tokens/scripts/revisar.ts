@@ -11,7 +11,7 @@ import { join, relative } from 'node:path';
 
 /** Archivos que no son UI de la app y por eso no usan tokens. */
 const EXCEPCIONES: Record<string, string> = {
-  'lib/ordenPdf.tsx': 'PDF generado con @react-pdf: usa las fuentes y medidas del PDF, no CSS',
+  'lib/ordenPdf.tsx': 'PDF de @react-pdf: medidas en puntos de PDF; familia y colores sí salen de tokens',
 };
 
 /** Reglas: qué se busca y qué se sugiere usar. */

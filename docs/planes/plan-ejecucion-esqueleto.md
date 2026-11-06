@@ -222,7 +222,8 @@ Hecha el 06/11/2026: los tipos se generan con el postgres-meta del stack
 
 - `paquetes/tokens`: script que genera `tokens.css` desde `tokens.json`, con variables nombradas por uso (`--font-ui`, `--font-data`, `--radius-card`, `--shadow-card`…). El CSS generado se commitea y no se edita a mano.
 - Manrope autoalojada en woff2 (`@font-face`, `font-display: swap`, pesos 400 a 800). Verificar sus cifras tabulares; si no alcanzan, se elige otra familia libre con tnum y solo cambia el token.
-- Librería de íconos sólidos: confirmar Phosphor (MIT).
+- Librería de íconos sólidos: **Phosphor** (MIT, confirmada el 06/11/2026), peso `fill`.
+- Velo de modales y hojas: token `scrim` en `tokens.json` (aprobado el 06/11/2026), única transparencia fuera de las sombras.
 - `formatearMonto()` única en el front; ningún componente arma "$ " a mano.
 - Lint en CI que falla con hex, `rgb()`, px fuera de escala o familias fuera de tokens.
 - Las pantallas actuales de Compras y Recepción pasan a la tipografía, los radios, las sombras y el fondo v2, sin rediseño. Íconos y rediseño completo, en la Etapa 11.
@@ -242,7 +243,7 @@ la tipografía, radios, sombras y fondo de la estética v2 del CLAUDE.md, sin re
 - `/registro`: nombre, apellido, email, contraseña (indicador de fortaleza), aceptación de términos (texto provisorio). Validación al salir del campo.
 - `/verificar`: pantalla "Revisá tu email" con reenvío; el enlace confirma y entra.
 - `/ingresar`, `/recuperar`, `/restablecer`.
-- Al crear la cuenta, un trigger crea la fila en `nucleo.cuentas`.
+- La fila de `nucleo.cuentas` ya la crea un trigger desde la Etapa 2 (`nucleo.crear_cuenta`): acá solo se verifica que el registro la genere.
 - Guardas: rutas públicas redirigen al panel si hay sesión; rutas privadas redirigen a `/ingresar` conservando el destino.
 
 **Entregable:** alta completa con el email capturado en Mailpit; ingreso, cierre y recuperación funcionando a 375 px y 1280 px.
@@ -251,9 +252,9 @@ la tipografía, radios, sombras y fondo de la estética v2 del CLAUDE.md, sin re
 Etapa 4. Construí las páginas públicas en apps/web/src/nucleo/publico: index, registro,
 verificar, ingresar, recuperar y restablecer, con Supabase Auth vía cliente-api. Aplicá
 la estética v2 del CLAUDE.md (tokens de paquetes/tokens) y docs/principios-ux.md; usá las skills page-patterns, forms, labels,
-errors y verbs, y cerrá con ux-audit. Textos en español rioplatense con voseo. Trigger
-en la base que crea nucleo.cuentas al registrarse. Guardas de rutas públicas/privadas
-conservando el destino.
+errors y verbs, y cerrá con ux-audit. Textos en español rioplatense con voseo. El trigger que crea
+nucleo.cuentas ya existe (Etapa 2). Guardas de rutas públicas/privadas conservando el
+destino.
 ```
 
 ### Etapa 5 · Bienvenida y organización (2 a 3 días)
@@ -273,7 +274,7 @@ organización con la organización en la URL (/o/:org). Guardá la última organ
 
 ### Etapa 6 · Shell y navegación (3 a 4 días)
 
-- Layout `/o/:org/*` con barra vertical **a la izquierda** en escritorio, fija, ancho 264 px, colapsable a 72 px (solo íconos con tooltip).
+- Layout `/o/:org/*` con barra vertical **a la izquierda** en escritorio, fija, ancho 248 px (como la referencia visual "v2 · Estilo nuevo"), colapsable a 72 px (solo íconos con tooltip). Tarjeta `surface-100` con `radius-card` y `shadow-card` sobre el fondo `surface-200`; ítem activo en `brand-tint` con su ícono en contenedor `brand`.
 - **Zona superior:** selector de organización · Inicio · Perfil de empresa · Usuarios · Salas de reuniones · separador con rótulo "Herramientas" · Compras · Recepción.
 - **Zona inferior:** avatar y nombre · Perfil personal · Cuenta · Privacidad · Cerrar sesión.
 - Cada ítem se muestra solo si el usuario tiene el permiso de entrada; las herramientas, además, si el módulo está habilitado.
@@ -358,8 +359,8 @@ invitar/aceptar y de que un suspendido pierde acceso al instante.
 Etapa 10. Implementá modulos/colab: salas (públicas en la organización o privadas con
 miembros y contraseña opcional hasheada con pgcrypto), chat de texto con RPC de envío y
 Realtime para difusión, historial paginado, no leídos, adjuntos en Storage y enlace de
-llamada externa opcional. Sin voz. Registralo en modulos/registro.ts como módulo del
-núcleo (siempre habilitado).
+llamada externa opcional. Sin voz. Registralo en modulos/registro.ts como módulo
+habilitable por organización (código colab, ya registrado en nucleo.modulos).
 ```
 
 ### Etapa 11 · Compras y Recepción como herramientas (3 a 4 días)
@@ -367,7 +368,9 @@ núcleo (siempre habilitado).
 - Mover páginas y componentes a `modulos/compras` y `modulos/recepcion`; rutas bajo `/o/:org/compras/*` y `/o/:org/recepcion/*`.
 - Entradas en `modulos/registro.ts` con su permiso de entrada; el kiosco de Recepción conserva su modo pantalla completa (sin barra) en tablet.
 - La cola offline de Recepción se separa por organización.
-- Correr el guion de prueba de punta a punta existente sobre el núcleo nuevo.
+- Actualizar `docs/guion-prueba-compras.md` al modelo nuevo (organización, membresías, cuenta demo) y correrlo de punta a punta.
+- Íconos de Compras y Recepción: de Lucide a Phosphor sólidos en contenedores; al terminar, quitar `lucide-react` y la excepción de ESLint.
+- Repartir `apps/web/src/styles/app.css` por módulo (hoy pasa las ~300 líneas, justificado en su cabecera).
 
 **Entregable:** el guion de Compras → Recepción pasa completo; deshabilitar Compras en una organización la quita de la barra y bloquea sus RPC.
 
@@ -418,6 +421,6 @@ Con los tres primeros puntos arranca la Etapa 0; el resto puede llegar en el cam
 - [x] **OK a las decisiones de esta etapa:** base compartida con RLS, organización en la URL, línea base v1 de migraciones, barra a la izquierda con comportamiento móvil propio.
 - [x] **Lista de puestos** para el desplegable de bienvenida (si no, cargo una semilla genérica marcada como provisoria): semilla genérica aprobada.
 - [x] **Textos legales provisorios:** confirmar que en desarrollo usamos términos y privacidad de ejemplo, reemplazados antes de abrir al público.
-- [ ] **Cuenta de GitHub** del repo, para el CI.
+- [x] **Cuenta de GitHub** del repo, para el CI: `getter13/eskemia-plataform` (privado).
 
 Al aprobar, Claude Code copia este plan a `docs/planes/plan-ejecucion-esqueleto.md` y empieza por el prompt de la Etapa 0.

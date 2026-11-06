@@ -1,3 +1,5 @@
+> **HISTÓRICO.** Auditoría del MVP (Vercel + Supabase cloud). Sus hallazgos se resuelven en el plan del esqueleto y en docs/runbook-infra.md; no describe el sistema actual.
+
 # Eskemia · Auditoría técnica y plan de alineación
 
 > Fecha: 04/11/2026 · Revisión del repo real (`C:\Users\CHUWAKA\Eskemia plataform`).

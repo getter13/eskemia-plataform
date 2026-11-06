@@ -26,9 +26,12 @@ contradicen, se pregunta antes de seguir.
 - Tarjeta de Inicio: bloque de información o acceso que un módulo ofrece para el Inicio.
 
 ## Stack
-- Lenguajes: TypeScript (estricto) y SQL/PL-pgSQL. No agregar otros.
+- Lenguajes: TypeScript (estricto) y SQL/PL-pgSQL. No agregar otros. Única excepción: scripts
+  de shell POSIX (sh) para operar la base y la infraestructura (db/scripts, infra/compose),
+  sin lógica de negocio.
 - Base: Supabase self-hosted (compose en infra/compose, versiones fijadas).
 - Web: React + Vite + TS, PWA, React Router, TanStack Query, Zustand, Zod, Radix, Vaul, Dexie.
+  Íconos: Phosphor (@phosphor-icons/react). Tipografía: Manrope (@fontsource/manrope).
 - apps/api: Node LTS + Hono. Solo integraciones externas (hoy: envío de emails desde pgmq).
 - Monorepo pnpm. CI en GitHub Actions.
 
@@ -41,8 +44,9 @@ contradicen, se pregunta antes de seguir.
 - El código consulta permisos por código ('compras.oc.aprobar'), nunca nombres de rol,
   y nunca pregunta por el modo de despliegue.
 - Ningún archivo fuera de paquetes/cliente-api importa @supabase/supabase-js.
-- Cada módulo nuevo: esquema SQL + entrada en modulos/registro.ts (con sus tarjetas de Inicio)
-  + permisos + tests + doc.
+- Cada módulo nuevo: esquema SQL + entrada en modulos/registro.ts (con sus tarjetas de Inicio,
+  registradas también en db/semillas/04_tarjetas_inicio.sql con el mismo código) + permisos +
+  tests + doc.
 - Migraciones solo hacia adelante, una nueva por cambio. db/legado/ es solo lectura.
 - Tests de aislamiento A/B para toda tabla nueva.
 
@@ -53,7 +57,7 @@ contradicen, se pregunta antes de seguir.
 - Ningún archivo de src supera ~300 líneas sin justificación escrita.
 
 ## UI
-- Paleta: manual de marca Eskemia, sin cambios (surface-100/200, line, ink, ink-muted, brand,
+- Paleta de la marca Eskemia, la misma desde la v1 (surface-100/200, line, ink, ink-muted, brand,
   brand-deep, brand-tint, accent, signal-error). Proporción 70 neutros · 20 brand · 10 accent.
   accent nunca como texto sobre claro. Tokens en paquetes/tokens, generados desde el
   tokens.json del sistema de diseño Eskemia v2.
@@ -87,13 +91,14 @@ de escala o familias tipográficas fuera de tokens.
 | Radios | Tokens radius-icon 10 · radius-control 14 · radius-block 18 · radius-card 24 · radius-pill 999 |
 | Píldoras | Estados, chips de filtro, buscador, botones de acción secundaria, barra fija de carrito/confirmación y navegación inferior móvil |
 | Profundidad | Fondo de la app surface-200; tarjetas y paneles surface-100 con `--shadow-card` (0 1px 2px rgba(21,24,29,.05), 0 8px 24px rgba(21,24,29,.05)). Elementos flotantes (barra de carrito, menús, hojas) con `--shadow-float`. Los bordes quedan para estados: error, borrador/en curso (punteado), foco |
-| Íconos | Sólidos (relleno), dentro de contenedores redondeados: brand-tint con ícono brand, o brand con ícono surface-100 para la acción principal. Librería abierta con variante sólida (candidata: Phosphor, MIT; confirmar en la Etapa 3b). Íconos de solo trazo únicamente para utilidades chicas (buscar, flechas, cerrar) |
+| Íconos | Sólidos (relleno), dentro de contenedores redondeados: brand-tint con ícono brand, o brand con ícono surface-100 para la acción principal. Librería: **Phosphor** (MIT, confirmada el 06/11/2026), peso `fill`; peso `regular` (trazo) únicamente para utilidades chicas (buscar, flechas, cerrar). Lucide queda solo en las pantallas heredadas hasta la Etapa 11; ESLint la prohíbe en código nuevo |
 | Estados | Píldora con ícono + texto, nunca solo color |
-| Transparencias | Solo en sombras. Sin glassmorphism, sin desenfoques, sin degradados decorativos |
+| Transparencias | Solo en sombras y en el velo detrás de modales y hojas (token `--scrim`, aprobado 06/11/2026). Sin glassmorphism, sin desenfoques, sin degradados decorativos |
 | Táctil | ≥ 44 px en escritorio, ≥ 48 px en celular, ≥ 56 px en el kiosco de Recepción |
 
-Pendiente de verificar en la Etapa 3b (tokens): calidad de las cifras tabulares de Manrope.
-Si no alcanza, se elige otra familia libre con tnum y solo cambia el token.
+Cifras tabulares de Manrope verificadas en la Etapa 3b (06/11/2026): con `tabular-nums` los
+diez dígitos miden lo mismo. Si algún día no alcanzan, se elige otra familia libre con tnum y
+solo cambia el token.
 El sitio público (apps/sitio) reutiliza estos mismos tokens.
 
 ## Inicio (aprobado 06/11/2026)
@@ -169,7 +174,7 @@ no posiciona ni debe posicionar. El posicionamiento vive en un sitio público se
   self-hosted), alineada con la Ley 25.326. Nunca analítica de marketing dentro de la app.
 
 ## Fuera de alcance en esta etapa
-Precios, planes, pasarelas de pago, suscripciones, voz, Eskemia Local. El sitio público se
+Precios, planes, pasarelas de pago, suscripciones, voz, Eskemia Local, tema oscuro. El sitio público se
 construye en Fase 4; en esta etapa solo aplica la regla de `noindex` en la app y entornos.
 
 ## Forma de trabajo

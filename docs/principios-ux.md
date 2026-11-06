@@ -1,6 +1,6 @@
 # Eskemia · Principios UX/UI (todos los módulos)
 
-> Rige para todos los módulos de Eskemia. Los colores, tipografías y tokens salen del manual de marca Eskemia; este documento define **cómo se usa** la interfaz, no cómo se ve.
+> Rige para todos los módulos de Eskemia. Los colores, tipografías y tokens salen del sistema de diseño Eskemia v2; este documento define **cómo se usa** la interfaz, no cómo se ve.
 >
 > **Sistema de diseño v2 (aprobado por el CEO el 06/11/2026).** Los valores viven en `paquetes/tokens/tokens.json`. La estética completa está en la sección "Estética v2" del `CLAUDE.md` (manda ante cualquier diferencia); acá, el resumen de uso en la sección 9.
 
@@ -82,7 +82,7 @@ Antes de la primera pantalla, correr una vez `/vectorlab-ux-skills:setup-ui-ux-s
 | Antipatrones prohibidos | Glassmorphism, degradados decorativos, CTAs múltiples por vista, ilustraciones caricaturescas, modales centrados en móvil, spinners de pantalla completa |
 | Accesibilidad | WCAG 2.2 AA |
 | Voz | Español rioplatense con voseo ("Confirmá el pedido"), directo, sin tecnicismos |
-| Íconos | Sólidos dentro de contenedores (v2). Librería candidata: Phosphor (MIT), a confirmar en la etapa de tokens |
+| Íconos | Phosphor (MIT), peso `fill`, dentro de contenedores (v2). Confirmada el 06/11/2026 |
 
 En cada etapa con UI usar las skills correspondientes (`page-patterns`, `viewports`, `forms`, `surfaces`, `loaders`, `empty-states`, `errors`, `verbs`, `motion`) y cerrar con `ux-audit`.
 

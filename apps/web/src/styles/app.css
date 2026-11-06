@@ -413,7 +413,7 @@ p {
 .fondo-modal {
   position: fixed;
   inset: 0;
-  background: color-mix(in srgb, var(--ink) 45%, transparent);
+  background: var(--scrim);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1135,7 +1135,7 @@ body,
   position: fixed;
   inset: 0;
   z-index: 10;
-  background: color-mix(in srgb, var(--ink) 45%, transparent);
+  background: var(--scrim);
 }
 .mk-hoja {
   position: fixed;

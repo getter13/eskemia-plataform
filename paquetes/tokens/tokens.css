@@ -13,6 +13,7 @@
   --brand-tint: #d3e7e3; /* Contenedores de íconos, ítem de navegación activo, píldoras de estado OK, chip destacado. Texto brand-deep o ink encima. */
   --accent: #f0a81a; /* Ámbar: 'requiere aprobación', contadores, avisos de novedad, comunidad. NUNCA como texto sobre claro; texto ink encima (≈9:1). */
   --signal-error: #b4372b; /* Errores y diferencias, siempre con ícono y texto. ≈5.5:1 sobre surface-100. */
+  --scrim: rgba(21, 24, 29, 0.45); /* Velo detrás de modales y hojas inferiores (ink al 45 %). Única transparencia permitida fuera de las sombras. Aprobado por el CEO el 06/11/2026. */
 
   /* Familias: --font-data lleva cifras tabulares (ver .datos en la app). */
   --font-ui: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;

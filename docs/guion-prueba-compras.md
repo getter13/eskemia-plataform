@@ -1,3 +1,5 @@
+> **HISTÓRICO.** Guion escrito para el MVP (Supabase cloud). Se actualiza al modelo nuevo en la Etapa 11, antes de correrlo.
+
 # Guion de prueba: de la compra a la recepción
 
 Recorre el criterio de salida del MVP (`docs/plan-compras.md` §9) con los datos demo. Toma unos 15 minutos.

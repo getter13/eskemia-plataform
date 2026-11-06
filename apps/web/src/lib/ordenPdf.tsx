@@ -1,26 +1,41 @@
-// Comprobante de la orden para el proveedor. Este módulo y su librería bajan solo al generar un PDF.
-import { Document, Page, StyleSheet, Text, View, pdf } from '@react-pdf/renderer';
-import { formatearMonto } from './catalogo';
-import { formatoFecha, formatoFechaHora, formatoNumero } from './formato';
+// Eskemia · Comprobante PDF de la orden de compra para el proveedor.
+//
+// Qué hace: arma el PDF con @react-pdf. Usa Manrope (los .woff de @fontsource, porque
+// react-pdf no lee woff2) y los colores de tokens.json, así el PDF sigue a la marca sin
+// valores sueltos. Las medidas van en puntos de PDF, no en tokens CSS: por eso el lint de
+// tokens lo lista como excepción.
+// Dónde encaja: este módulo y su librería bajan solo al generar un PDF (import dinámico).
+import { Document, Font, Page, StyleSheet, Text, View, pdf } from '@react-pdf/renderer';
+import tokens from '@eskemia/tokens/tokens.json';
+import manrope500 from '@fontsource/manrope/files/manrope-latin-500-normal.woff?url';
+import manrope800 from '@fontsource/manrope/files/manrope-latin-800-normal.woff?url';
+import { formatearMonto, formatoFecha, formatoFechaHora, formatoNumero } from './formato';
 import type { ItemOrden, OrdenResumen } from './ordenes';
 
-const TINTA = '#15181d';
-const SECUNDARIO = '#5b6068';
-const LINEA = '#d5d2c8';
-const MARCA = '#0e5e5a';
+Font.register({
+  family: 'Manrope',
+  fonts: [
+    { src: manrope500, fontWeight: 500 },
+    { src: manrope800, fontWeight: 800 },
+  ],
+});
+
+/** Color de marca por nombre de token (tokens.json). */
+const color = (nombre: string) => tokens.color.tokens.find((t) => t.name === nombre)?.value ?? 'black';
 
 const e = StyleSheet.create({
-  pagina: { padding: 40, fontSize: 10, color: TINTA, fontFamily: 'Helvetica' },
-  marca: { fontSize: 16, color: MARCA, fontFamily: 'Helvetica-Bold', marginBottom: 16 },
-  titulo: { fontSize: 18, fontFamily: 'Helvetica-Bold', marginBottom: 4 },
-  dato: { color: SECUNDARIO, marginBottom: 2 },
+  pagina: { padding: 40, fontSize: 10, color: color('ink'), fontFamily: 'Manrope', fontWeight: 500 },
+  marca: { fontSize: 16, color: color('brand'), fontWeight: 800, marginBottom: 16 },
+  titulo: { fontSize: 18, fontWeight: 800, marginBottom: 4 },
+  dato: { color: color('ink-muted'), marginBottom: 2 },
   bloque: { marginTop: 16, marginBottom: 16 },
-  fila: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: LINEA, paddingVertical: 5 },
-  encabezado: { fontFamily: 'Helvetica-Bold', borderBottomColor: TINTA },
+  fila: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: color('line'), paddingVertical: 5 },
+  encabezado: { fontWeight: 800, borderBottomColor: color('ink') },
+  destacado: { fontWeight: 800 },
   producto: { flex: 3, paddingRight: 8 },
   presentacion: { flex: 2, paddingRight: 8 },
   numero: { flex: 1, textAlign: 'right' },
-  total: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 12, fontFamily: 'Helvetica-Bold', fontSize: 12 },
+  total: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 12, fontWeight: 800, fontSize: 12 },
 });
 
 function DocumentoOrden({ orden, items }: { orden: OrdenResumen; items: ItemOrden[] }) {
@@ -37,7 +52,7 @@ function DocumentoOrden({ orden, items }: { orden: OrdenResumen; items: ItemOrde
 
         {proveedor && (
           <View style={e.bloque}>
-            <Text style={{ fontFamily: 'Helvetica-Bold' }}>{proveedor.nombre}</Text>
+            <Text style={e.destacado}>{proveedor.nombre}</Text>
             <Text style={e.dato}>CUIT {proveedor.cuit}</Text>
             {proveedor.codigo && <Text style={e.dato}>ID {proveedor.codigo}</Text>}
           </View>

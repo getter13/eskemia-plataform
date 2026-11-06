@@ -71,7 +71,7 @@ en el servidor. La lógica de negocio vive en PL/pgSQL dentro de Postgres: `conf
 producción:
 
 1. **Vite**, que corre solo al compilar. El resultado son archivos estáticos.
-2. **Un script** (`supabase/scripts/crear-usuarios-prueba.mjs`), utilidad de desarrollo.
+2. **Un script** (`db/legado/supabase-cloud/scripts/crear-usuarios-prueba.mjs`, del MVP; hoy lo reemplaza `db/scripts/demo.sh`), utilidad de desarrollo.
 
 Entonces la pregunta "¿Node o Python?" todavía no tiene objeto: no hay dónde ponerlo.
 
