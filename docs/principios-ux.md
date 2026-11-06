@@ -2,7 +2,7 @@
 
 > Rige para todos los módulos de Eskemia. Los colores, tipografías y tokens salen del manual de marca Eskemia; este documento define **cómo se usa** la interfaz, no cómo se ve.
 >
-> **Sistema de diseño v2 (aprobado por el CEO el 06/11/2026).** Los valores viven en `paquetes/tokens/tokens.json`; las reglas de uso, en la sección 9.
+> **Sistema de diseño v2 (aprobado por el CEO el 06/11/2026).** Los valores viven en `paquetes/tokens/tokens.json`. La estética completa está en la sección "Estética v2" del `CLAUDE.md` (manda ante cualquier diferencia); acá, el resumen de uso en la sección 9.
 
 ## 1. Para quién diseñamos
 
@@ -55,7 +55,7 @@ Consecuencias:
 
 ## 5. Objetivos táctiles y layout
 
-- Mínimo 48 × 48 px en móvil (56 px en el kiosco de Recepción). Separación mínima 8 px.
+- Mínimo 44 × 44 px en escritorio, 48 × 48 px en móvil y 56 px en el kiosco de Recepción. Separación mínima 8 px.
 - Ritmo de espaciado de 4/8 px (tokens del manual).
 - Sin desplazamiento horizontal de página entre 375 y 1280 px. Tablas: en móvil se transforman en tarjetas.
 - Tipografía base 16 px en móvil (evita el zoom automático de iOS en inputs).
@@ -82,7 +82,7 @@ Antes de la primera pantalla, correr una vez `/vectorlab-ux-skills:setup-ui-ux-s
 | Antipatrones prohibidos | Glassmorphism, degradados decorativos, CTAs múltiples por vista, ilustraciones caricaturescas, modales centrados en móvil, spinners de pantalla completa |
 | Accesibilidad | WCAG 2.2 AA |
 | Voz | Español rioplatense con voseo ("Confirmá el pedido"), directo, sin tecnicismos |
-| Íconos | Sólidos dentro de contenedores (v2). Librería: pendiente de definir |
+| Íconos | Sólidos dentro de contenedores (v2). Librería candidata: Phosphor (MIT), a confirmar en la etapa de tokens |
 
 En cada etapa con UI usar las skills correspondientes (`page-patterns`, `viewports`, `forms`, `surfaces`, `loaders`, `empty-states`, `errors`, `verbs`, `motion`) y cerrar con `ux-audit`.
 
@@ -90,16 +90,21 @@ En cada etapa con UI usar las skills correspondientes (`page-patterns`, `viewpor
 
 | Tema | Regla |
 |---|---|
-| Tipografía | Manrope es la única familia. Sin monoespaciada |
-| Cifras | Tabulares en todo dato numérico (montos, cantidades, tablas), vía `--font-data` |
-| Tokens | Se usan por nombre de uso (`--font-ui`, `--font-data`, `--radius-card`, `--shadow-card`…), nunca primitivos ni valores sueltos |
+| Tipografía | Manrope es la única familia, autoalojada en woff2 (nunca desde un CDN). Sin monoespaciada |
+| Cifras | Tabulares en todo dato numérico (montos, cantidades, OC, remitos, códigos), vía `--font-data` |
+| Tokens | Se usan por nombre de uso (`--font-ui`, `--font-data`, `--radius-card`, `--shadow-card`…), nunca primitivos ni valores sueltos. Un lint en CI falla con hex, px fuera de escala o familias fuera de tokens |
 | Color, radio, sombra | Solo por token. Nada de hex, `rgb()`, radios o sombras escritos a mano |
-| Íconos | Sólidos, dentro de un contenedor |
+| Profundidad | Fondo surface-200; tarjetas surface-100 con `--shadow-card`; flotantes con `--shadow-float`. Los bordes quedan para estados: error, en curso (punteado) y foco |
+| Píldoras | Estados, chips, buscador, acciones secundarias, barra fija de carrito y navegación inferior móvil |
+| Íconos | Sólidos, dentro de un contenedor (brand-tint con ícono brand; brand con ícono surface-100 para la acción principal). De solo trazo, únicamente utilidades chicas |
+| Estados | Píldora con ícono y texto, nunca solo color |
 | Montos | Siempre con `formatearMonto()`: `$ 1.240,50` |
 
 ## 10. Inicio personalizable
 
-- Cada usuario arma su Inicio con tarjetas, por organización: elige cuáles ve y en qué orden.
-- Cada módulo declara sus tarjetas en `modulos/registro.ts` (código, título, permiso que exige). El Inicio no conoce a ningún módulo.
-- Una tarjeta solo aparece si el módulo está habilitado y el usuario tiene su permiso.
-- Sin elección guardada, se muestran las tarjetas por defecto que declara cada módulo.
+- El Inicio no es de ningún módulo y no muestra datos de ninguno por defecto.
+- Cada usuario arma su Inicio con tarjetas, por organización: elige cuáles ve y en qué orden. Se guarda en la base por membresía (igual en celular y escritorio) y cada cambio queda en eventos.
+- Cada módulo, incluidos los del núcleo (Usuarios, Salas, Perfil de empresa), declara sus tarjetas en `modulos/registro.ts` (código, título, permiso que exige, tamaño). El Inicio no conoce a ningún módulo.
+- Una tarjeta es elegible solo si el módulo está habilitado y el usuario tiene su permiso. Lo valida la base (RPC), no la pantalla. Si después pierde el permiso o se deshabilita el módulo, la tarjeta desaparece sin romper el Inicio.
+- "Personalizar inicio" y "Agregar tarjeta" siempre visibles. Sin tarjetas elegidas, el Inicio muestra un estado vacío accionable, nunca una pantalla en blanco.
+- Pendiente de definir: Inicio por defecto por puesto, armado por el administrador como punto de partida.
